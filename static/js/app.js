@@ -89,14 +89,15 @@ function validateInput(event) {
 }
 
 function validateFunction() {
-    const value = currentFunction.trim();
+    const functionInput = document.getElementById('function');
+    const value = functionInput ? functionInput.value.trim() : '';
     
     if (!value) {
-        showInputError(hiddenInput, 'Por favor, insira uma função');
+        showInputError(functionInput, 'Por favor, insira uma função');
         return false;
     }
     
-    clearInputError(hiddenInput);
+    clearInputError(functionInput);
     return true;
 }
 
