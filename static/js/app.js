@@ -14,6 +14,8 @@ const hiddenInput = document.getElementById('function');
 
 // Function expression storage
 let currentFunction = '';
+let functionChart = null;
+let convergenceChart = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -104,8 +106,15 @@ function setupCalculatorButtons() {
     });
 
     // Action buttons
-    document.getElementById('clearBtn').addEventListener('click', clearFunction);
-    document.getElementById('backspaceBtn').addEventListener('click', backspaceFunction);
+    const clearBtn = document.getElementById('clearBtn');
+    const backspaceBtn = document.getElementById('backspaceBtn');
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearFunction);
+    }
+    if (backspaceBtn) {
+        backspaceBtn.addEventListener('click', backspaceFunction);
+    }
 
     // Generic symbol buttons
     document.querySelectorAll('[data-symbol]').forEach(btn => {
@@ -387,6 +396,9 @@ function displayResults(result) {
     // Build iterations table
     buildIterationsTable(result);
     
+    // Create charts
+    createCharts(result);
+    
     // Show results with animation
     results.classList.remove('hidden');
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -513,6 +525,321 @@ function hideError() {
 
 function hideResults() {
     results.classList.add('hidden');
+    // Destroy existing charts
+    if (functionChart) {
+        functionChart.destroy();
+        functionChart = null;
+    }
+    if (convergenceChart) {
+        convergenceChart.destroy();
+        convergenceChart = null;
+    }
+}
+
+function createCharts(result) {
+    createFunctionChart(result);
+    createConvergenceChart(result);
+}
+
+function createFunctionChart(result) {
+    const ctx = document.getElementById('functionChart');
+    if (!ctx) return;
+
+    // Destroy existing chart
+    if (functionChart) {
+        functionChart.destroy();
+    }
+
+    // Generate function data points
+    const functionData = generateFunctionData(result);
+    
+    functionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'f(x)',
+                    data: functionData.points,
+                    borderColor: 'rgb(236, 64, 122)',
+                    backgroundColor: 'rgba(236, 64, 122, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'y = 0',
+                    data: functionData.zeroLine,
+                    borderColor: 'rgba(100, 100, 100, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                },
+                {
+                    label: 'Raiz encontrada',
+                    data: [{ x: result.root, y: 0 }],
+                    backgroundColor: 'rgb(76, 175, 80)',
+                    borderColor: 'rgb(76, 175, 80)',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    showLine: false
+                },
+                ...generateIterationPoints(result)
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Gráfico de ${currentFunction}`,
+                    font: { size: 16, weight: 'bold' },
+                    color: 'rgb(236, 64, 122)'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: 'x'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'f(x)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function createConvergenceChart(result) {
+    const ctx = document.getElementById('convergenceChart');
+    if (!ctx) return;
+
+    // Destroy existing chart
+    if (convergenceChart) {
+        convergenceChart.destroy();
+    }
+
+    const convergenceData = generateConvergenceData(result);
+    
+    convergenceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'Valor de x',
+                    data: convergenceData.xValues,
+                    borderColor: 'rgb(33, 150, 243)',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Erro Relativo (%)',
+                    data: convergenceData.errors,
+                    borderColor: 'rgb(255, 152, 0)',
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    borderWidth: 2,
+                    fill: false,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Raiz verdadeira',
+                    data: convergenceData.trueLine,
+                    borderColor: 'rgba(76, 175, 80, 0.8)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Convergência - ${result.method}`,
+                    font: { size: 16, weight: 'bold' },
+                    color: 'rgb(236, 64, 122)'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Iteração'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Valor de x'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Erro Relativo (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function generateFunctionData(result) {
+    // Calculate range around the root
+    const root = result.root;
+    const range = Math.max(2, Math.abs(root) * 0.5);
+    const xMin = root - range;
+    const xMax = root + range;
+    const numPoints = 200;
+    const step = (xMax - xMin) / numPoints;
+    
+    const points = [];
+    const zeroLine = [];
+    
+    // Generate function points using simple evaluation
+    for (let i = 0; i <= numPoints; i++) {
+        const x = xMin + i * step;
+        try {
+            // Simple function evaluation for common cases
+            let y = evaluateFunction(currentFunction, x);
+            
+            if (isFinite(y) && Math.abs(y) < 1000) {
+                points.push({ x: x, y: y });
+            }
+        } catch (e) {
+            // Skip problematic points
+        }
+        zeroLine.push({ x: x, y: 0 });
+    }
+    
+    return { points, zeroLine };
+}
+
+function generateIterationPoints(result) {
+    const points = [];
+    
+    if (result.method === 'Newton-Raphson') {
+        // Show Newton-Raphson iteration points
+        result.iterations.forEach((iter, index) => {
+            points.push({
+                label: `Iteração ${index}`,
+                data: [{ x: iter.xi, y: iter.fxi }],
+                backgroundColor: `hsl(${index * 30}, 70%, 50%)`,
+                borderColor: `hsl(${index * 30}, 70%, 40%)`,
+                pointRadius: 5,
+                showLine: false
+            });
+        });
+    } else {
+        // Show False Position interval progression
+        result.iterations.forEach((iter, index) => {
+            points.push({
+                label: `Iteração ${index + 1}`,
+                data: [{ x: iter.x, y: iter.fx }],
+                backgroundColor: `hsl(${index * 20}, 60%, 50%)`,
+                borderColor: `hsl(${index * 20}, 60%, 40%)`,
+                pointRadius: 4,
+                showLine: false
+            });
+        });
+    }
+    
+    return points;
+}
+
+function generateConvergenceData(result) {
+    const xValues = [];
+    const errors = [];
+    const trueLine = [];
+    
+    result.iterations.forEach((iter, index) => {
+        if (result.method === 'Newton-Raphson') {
+            xValues.push({ x: index, y: iter.xi_plus_1 });
+            if (iter.relative_error_percent !== 'N/A') {
+                errors.push({ x: index, y: parseFloat(iter.relative_error_percent) });
+            }
+        } else {
+            xValues.push({ x: index, y: iter.x });
+            if (iter.relative_error !== 'N/A') {
+                errors.push({ x: index, y: parseFloat(iter.relative_error) * 100 });
+            }
+        }
+        trueLine.push({ x: index, y: result.root });
+    });
+    
+    return { xValues, errors, trueLine };
+}
+
+function evaluateFunction(func, x) {
+    // Simple function evaluator for common mathematical expressions
+    let expression = func;
+    
+    // Replace mathematical constants and functions
+    expression = expression.replace(/\bpi\b/g, Math.PI);
+    expression = expression.replace(/\be\b/g, Math.E);
+    expression = expression.replace(/\^/g, '**');
+    expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
+    expression = expression.replace(/sin\(/g, 'Math.sin(');
+    expression = expression.replace(/cos\(/g, 'Math.cos(');
+    expression = expression.replace(/tan\(/g, 'Math.tan(');
+    expression = expression.replace(/log\(/g, 'Math.log(');
+    expression = expression.replace(/exp\(/g, 'Math.exp(');
+    expression = expression.replace(/\bx\b/g, x);
+    
+    // Evaluate safely
+    try {
+        return Function('"use strict"; return (' + expression + ')')();
+    } catch (e) {
+        return NaN;
+    }
 }
 
 // Add some mathematical function examples on focus

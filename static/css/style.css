@@ -425,6 +425,44 @@ body {
     font-weight: 700;
 }
 
+/* Charts Container */
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.chart-section {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow-light);
+    border: 2px solid var(--pale-pink);
+}
+
+.chart-section h3 {
+    color: var(--primary-pink);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.chart-section h3 i {
+    margin-right: 8px;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+.chart-wrapper canvas {
+    max-height: 100%;
+    max-width: 100%;
+}
+
 /* Parameters Grid */
 .parameters-grid {
     display: grid;
@@ -759,6 +797,15 @@ body {
     .function-display {
         font-size: 1rem;
         padding: 12px 15px;
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .chart-wrapper {
+        height: 300px;
     }
     
     .parameters-grid {

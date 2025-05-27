@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -225,6 +226,23 @@
                 </div>
 
                 <div class="convergence-info" id="convergenceInfo"></div>
+
+                <!-- Gráficos -->
+                <div class="charts-container">
+                    <div class="chart-section">
+                        <h3><i class="fas fa-chart-line"></i> Gráfico da Função</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="functionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <h3><i class="fas fa-bullseye"></i> Convergência do Método</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="convergenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="iterations-table-container">
                     <h3><i class="fas fa-table"></i> Tabela de Iterações</h3>
