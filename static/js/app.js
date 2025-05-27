@@ -19,7 +19,6 @@ let convergenceChart = null;
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     updateMethodDisplay();
-    initializeCalculator();
 });
 
 function setupEventListeners() {
@@ -51,124 +50,10 @@ function initializeCalculator() {
     updateFunctionDisplay();
 }
 
-function setupCalculatorButtons() {
-    // Number buttons
-    document.querySelectorAll('.number-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            insertToFunction(this.getAttribute('data-number'));
-        });
-    });
-
-    // Operator buttons  
-    document.querySelectorAll('.operator-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const op = this.getAttribute('data-op');
-            insertToFunction(op === '×' ? '*' : op);
-        });
-    });
-
-    // Function buttons
-    document.querySelectorAll('.function-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            insertToFunction(this.getAttribute('data-func'));
-        });
-    });
-
-    // Power buttons
-    document.querySelectorAll('.power-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const power = this.getAttribute('data-power');
-            insertToFunction('^' + power);
-        });
-    });
-
-    // Constant buttons
-    document.querySelectorAll('.constant-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            insertToFunction(this.getAttribute('data-const'));
-        });
-    });
-
-    // Variable button
-    document.querySelectorAll('.variable-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            insertToFunction(this.getAttribute('data-var'));
-        });
-    });
-
-    // Special buttons
-    document.querySelectorAll('.special-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            insertToFunction(this.getAttribute('data-symbol'));
-        });
-    });
-
-    // Action buttons
-    const clearBtn = document.getElementById('clearBtn');
-    const backspaceBtn = document.getElementById('backspaceBtn');
-    
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearFunction);
-    }
-    if (backspaceBtn) {
-        backspaceBtn.addEventListener('click', backspaceFunction);
-    }
-
-    // Generic symbol buttons
-    document.querySelectorAll('[data-symbol]').forEach(btn => {
-        if (!btn.classList.contains('special-btn')) {
-            btn.addEventListener('click', function() {
-                insertToFunction(this.getAttribute('data-symbol'));
-            });
-        }
-    });
-}
-
-function insertToFunction(value) {
-    currentFunction += value;
-    updateFunctionDisplay();
-    clearInputError(hiddenInput);
-}
-
-function clearFunction() {
-    currentFunction = '';
-    updateFunctionDisplay();
-}
-
-function backspaceFunction() {
-    currentFunction = currentFunction.slice(0, -1);
-    updateFunctionDisplay();
-}
-
-function updateFunctionDisplay() {
-    if (currentFunction === '') {
-        functionContent.innerHTML = '<span class="placeholder">Digite sua função...</span>';
-        hiddenInput.value = '';
-    } else {
-        // Convert function to display format with superscripts
-        const displayFunction = formatFunctionForDisplay(currentFunction);
-        functionContent.innerHTML = displayFunction;
-        hiddenInput.value = currentFunction;
-    }
-}
-
-function formatFunctionForDisplay(func) {
-    // Convert ^ notation to superscript for display
-    let formatted = func;
-    
-    // Handle powers with parentheses like ^(2+x)
-    formatted = formatted.replace(/\^(\([^)]+\))/g, '<span class="superscript">$1</span>');
-    
-    // Handle simple powers like ^2, ^3, ^x, etc.
-    formatted = formatted.replace(/\^([a-zA-Z0-9]+)/g, '<span class="superscript">$1</span>');
-    
-    // Replace common functions with better display
-    formatted = formatted.replace(/sqrt\(/g, '√(');
-    formatted = formatted.replace(/log\(/g, 'ln(');
-    formatted = formatted.replace(/\bpi\b/g, 'π');
-    formatted = formatted.replace(/\be\b(?![a-zA-Z])/g, 'e');
-    
-    return formatted;
+// Function to get current function value from the math calculator
+function getCurrentFunction() {
+    const hiddenInput = document.getElementById('function');
+    return hiddenInput ? hiddenInput.value : '';
 }
 
 function updateMethodDisplay() {
@@ -400,6 +285,9 @@ function displayResults(result) {
     // Show results with animation
     results.classList.remove('hidden');
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Update current function for charts
+    currentFunction = getCurrentFunction();
 }
 
 function buildIterationsTable(result) {
