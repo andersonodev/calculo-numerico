@@ -72,8 +72,10 @@
                     </div>
                     <div id="newton-info" class="info-box">
                         <h3><i class="fas fa-info-circle"></i> Newton-Raphson</h3>
-                        <p>Fórmula: x<sub>n+1</sub> = x<sub>n</sub> - f(x<sub>n</sub>)/f'(x<sub>n</sub>)</p>
-                        <p>Convergência rápida, mas precisa de boa estimativa inicial.</p>
+                        <p>Fórmula: x<sub>i+1</sub> = x<sub>i</sub> - f(x<sub>i</sub>)/f'(x<sub>i</sub>)</p>
+                        <p>Baseado na série de Taylor com interpretação geométrica da reta tangente.</p>
+                        <p><strong>Convergência quadrática</strong> - muito rápida quando próximo da raiz.</p>
+                        <p><small>⚠️ Cuidado: pode não convergir se f'(x) = 0 ou x₀ muito distante da raiz.</small></p>
                     </div>
                 </div>
 

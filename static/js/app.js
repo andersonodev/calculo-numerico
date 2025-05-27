@@ -278,13 +278,16 @@ function buildIterationsTable(result) {
     tableHead.innerHTML = '';
     tableBody.innerHTML = '';
     
-    // Create header
+    // Create header based on method
     const headerRow = document.createElement('tr');
-    const headers = ['Iteração', 'x', 'f(x)', 'Erro Absoluto', 'Erro Relativo'];
+    let headers = [];
     
-    // Add derivative column for Newton-Raphson
     if (result.method === 'Newton-Raphson') {
-        headers.splice(3, 0, "f'(x)");
+        // Newton-Raphson headers following theory format
+        headers = ['i', 'xi', 'xi+1', 'f(xi)', "f'(xi)", 'Erro Absoluto', 'Erro Relativo (%)'];
+    } else {
+        // False Position headers
+        headers = ['Iteração', 'x', 'f(x)', 'Erro Absoluto', 'Erro Relativo'];
     }
     
     headers.forEach(header => {
@@ -299,37 +302,72 @@ function buildIterationsTable(result) {
     result.iterations.forEach((iteration, index) => {
         const row = document.createElement('tr');
         
-        // Iteration number
-        const iterationCell = document.createElement('td');
-        iterationCell.textContent = iteration.iteration;
-        row.appendChild(iterationCell);
-        
-        // x value
-        const xCell = document.createElement('td');
-        xCell.textContent = iteration.x;
-        row.appendChild(xCell);
-        
-        // f(x) value
-        const fxCell = document.createElement('td');
-        fxCell.textContent = iteration.fx;
-        row.appendChild(fxCell);
-        
-        // f'(x) value (Newton-Raphson only)
         if (result.method === 'Newton-Raphson') {
-            const dfxCell = document.createElement('td');
-            dfxCell.textContent = iteration.dfx || 'N/A';
-            row.appendChild(dfxCell);
+            // Newton-Raphson table format following theory
+            
+            // Iteration number (i)
+            const iterationCell = document.createElement('td');
+            iterationCell.textContent = iteration.iteration - 1; // Start from 0 like in theory
+            row.appendChild(iterationCell);
+            
+            // xi value
+            const xiCell = document.createElement('td');
+            xiCell.textContent = iteration.xi;
+            row.appendChild(xiCell);
+            
+            // xi+1 value
+            const xiPlusOneCell = document.createElement('td');
+            xiPlusOneCell.textContent = iteration.xi_plus_1;
+            row.appendChild(xiPlusOneCell);
+            
+            // f(xi) value
+            const fxiCell = document.createElement('td');
+            fxiCell.textContent = iteration.fxi;
+            row.appendChild(fxiCell);
+            
+            // f'(xi) value
+            const dfxiCell = document.createElement('td');
+            dfxiCell.textContent = iteration.dfxi;
+            row.appendChild(dfxiCell);
+            
+            // Absolute error
+            const absErrorCell = document.createElement('td');
+            absErrorCell.textContent = iteration.absolute_error;
+            row.appendChild(absErrorCell);
+            
+            // Relative error (%)
+            const relErrorCell = document.createElement('td');
+            relErrorCell.textContent = iteration.relative_error_percent + '%';
+            row.appendChild(relErrorCell);
+            
+        } else {
+            // False Position table format (existing)
+            
+            // Iteration number
+            const iterationCell = document.createElement('td');
+            iterationCell.textContent = iteration.iteration;
+            row.appendChild(iterationCell);
+            
+            // x value
+            const xCell = document.createElement('td');
+            xCell.textContent = iteration.x;
+            row.appendChild(xCell);
+            
+            // f(x) value
+            const fxCell = document.createElement('td');
+            fxCell.textContent = iteration.fx;
+            row.appendChild(fxCell);
+            
+            // Absolute error
+            const absErrorCell = document.createElement('td');
+            absErrorCell.textContent = iteration.absolute_error;
+            row.appendChild(absErrorCell);
+            
+            // Relative error
+            const relErrorCell = document.createElement('td');
+            relErrorCell.textContent = iteration.relative_error;
+            row.appendChild(relErrorCell);
         }
-        
-        // Absolute error
-        const absErrorCell = document.createElement('td');
-        absErrorCell.textContent = iteration.absolute_error;
-        row.appendChild(absErrorCell);
-        
-        // Relative error
-        const relErrorCell = document.createElement('td');
-        relErrorCell.textContent = iteration.relative_error;
-        row.appendChild(relErrorCell);
         
         tableBody.appendChild(row);
     });

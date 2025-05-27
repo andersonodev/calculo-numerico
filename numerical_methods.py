@@ -42,6 +42,9 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
         
         iterations = []
         xr_old = 0
+        xr = 0
+        fxr = 0
+        relative_error = float('inf')
         
         for i in range(max_iterations):
             # Calculate new approximation using False Position formula
@@ -86,7 +89,7 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
             'root': round(xr, 8),
             'function_value': round(fxr, 8),
             'iterations': iterations,
-            'converged': relative_error <= tolerance if i > 0 else False,
+            'converged': relative_error <= tolerance,
             'execution_time': round(execution_time, 6),
             'total_iterations': len(iterations)
         }
@@ -96,67 +99,91 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
 
 def newton_raphson(function_str: str, x0: float, tolerance: float, max_iterations: int) -> Dict[str, Any]:
     """
-    Implement the Newton-Raphson method
-    Formula: x(n+1) = xn - f(xn)/f'(xn)
+    Implement the Newton-Raphson method based on Taylor series
+    Formula: x(i+1) = xi - f(xi)/f'(xi)
+    
+    According to theory:
+    - Based on tangent line equation at point xi
+    - Uses derivative calculated analytically
+    - Relative error calculation: |xr - xr-1|/xr * 100%
     """
     start_time = time.time()
     
     try:
         expr, f, x = parse_function(function_str)
         
-        # Calculate derivative symbolically
+        # Calculate derivative symbolically using SymPy
         df_expr = sp.diff(expr, x)
         df = sp.lambdify(x, df_expr, 'numpy')
         
         iterations = []
-        xn = x0
+        xi = x0
+        converged = False
+        relative_error_percent = float('inf')
         
         for i in range(max_iterations):
-            fxn = f(xn)
-            dfxn = df(xn)
+            # Evaluate function and derivative at current point
+            fxi = f(xi)
+            dfxi = df(xi)
             
-            # Check if derivative is zero
-            if abs(dfxn) < 1e-14:
-                raise ValueError(f"Derivada muito próxima de zero na iteração {i+1}. O método pode não convergir.")
+            # Check if derivative is zero (critical point)
+            if abs(dfxi) < 1e-14:
+                raise ValueError(f"Derivada f'(x) = 0 na iteração {i+1}. Ponto crítico encontrado - método não pode convergir.")
             
-            # Calculate new approximation using Newton-Raphson formula
-            xn_new = xn - fxn / dfxn
+            # Calculate next approximation using Newton-Raphson formula
+            # xi+1 = xi - f(xi)/f'(xi)
+            xi_new = xi - fxi / dfxi
             
-            # Calculate errors
-            if i > 0:
-                absolute_error = abs(xn_new - xn)
-                relative_error = abs((xn_new - xn) / xn_new) if xn_new != 0 else float('inf')
+            # Calculate relative error according to theory: |xi+1 - xi|/xi+1 * 100%
+            if xi_new != 0:
+                relative_error_percent = abs((xi_new - xi) / xi_new) * 100
+                relative_error = relative_error_percent / 100  # For comparison with tolerance
             else:
-                absolute_error = float('inf')
+                relative_error_percent = float('inf')
                 relative_error = float('inf')
             
-            # Store iteration data
+            # Calculate absolute error
+            absolute_error = abs(xi_new - xi)
+            
+            # Evaluate function at new point
+            fxi_new = f(xi_new)
+            
+            # Store iteration data (following the theory format)
             iterations.append({
                 'iteration': i + 1,
-                'x': round(xn_new, 8),
-                'fx': round(f(xn_new), 8),
-                'dfx': round(dfxn, 8),
-                'absolute_error': round(absolute_error, 8) if absolute_error != float('inf') else 'N/A',
-                'relative_error': round(relative_error, 8) if relative_error != float('inf') else 'N/A'
+                'xi': round(xi, 8),
+                'xi_plus_1': round(xi_new, 8),
+                'fxi': round(fxi, 8),
+                'dfxi': round(dfxi, 8),
+                'absolute_error': round(absolute_error, 8),
+                'relative_error_percent': round(relative_error_percent, 8) if relative_error_percent != float('inf') else 'N/A'
             })
             
-            # Check convergence
-            if i > 0 and relative_error <= tolerance:
+            # Check convergence: relative error <= tolerance
+            if relative_error <= tolerance:
+                converged = True
                 break
             
-            xn = xn_new
+            # Prepare for next iteration
+            xi = xi_new
         
         execution_time = time.time() - start_time
         
+        # Final verification: substitute root back into original function
+        final_function_value = f(xi)
+        
         return {
             'method': 'Newton-Raphson',
-            'root': round(xn, 8),
-            'function_value': round(f(xn), 8),
+            'root': round(xi, 8),
+            'function_value': round(final_function_value, 8),
             'derivative_expression': str(df_expr),
+            'initial_point': x0,
             'iterations': iterations,
-            'converged': relative_error <= tolerance if i > 0 else False,
+            'converged': converged,
             'execution_time': round(execution_time, 6),
-            'total_iterations': len(iterations)
+            'total_iterations': len(iterations),
+            'convergence_type': 'Quadrática' if converged else 'Não convergiu',
+            'final_relative_error': round(relative_error_percent, 8) if relative_error_percent != float('inf') and relative_error_percent is not None else 'N/A'
         }
         
     except Exception as e:
