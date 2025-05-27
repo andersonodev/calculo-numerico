@@ -239,7 +239,7 @@ body {
     color: var(--text-dark);
 }
 
-/* Math Editor Container Premium */
+/* Math Editor Container Premium - Melhorias de Responsividade */
 .math-editor-container {
     background: linear-gradient(135deg, #fdf2f8, #fff7ed, #fdf2f8);
     border: 3px solid transparent;
@@ -277,11 +277,7 @@ body {
     margin-bottom: 20px;
     box-shadow: var(--shadow-light);
     transition: var(--transition);
-}
-
-.math-preview:hover {
-    box-shadow: var(--shadow-medium);
-    transform: translateY(-2px);
+    min-height: 60px; /* Altura mínima para consistência */
 }
 
 .function-label {
@@ -290,6 +286,9 @@ body {
     font-size: 1.3rem;
     margin-right: 15px;
     min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .math-input {
@@ -298,88 +297,10 @@ body {
     border: none;
     background: transparent;
     min-height: 40px;
+    width: 100%;
 }
 
-.math-input.fallback-input {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid var(--light-pink);
-    border-radius: 8px;
-    padding: 12px 15px;
-    font-family: 'Courier New', monospace;
-    color: var(--text-dark);
-    outline: none;
-    transition: var(--transition);
-}
-
-.math-input.fallback-input:focus {
-    border-color: var(--primary-pink);
-    box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.1);
-}
-
-/* Expression History */
-.expression-history {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid var(--medium-pink);
-}
-
-.history-header {
-    color: var(--primary-pink);
-    font-weight: 600;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.history-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.history-item {
-    background: var(--white);
-    border: 1px solid var(--light-pink);
-    border-radius: 8px;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.history-item:hover {
-    background: var(--light-pink);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-light);
-}
-
-.history-item .expression {
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    color: var(--text-dark);
-}
-
-.use-btn {
-    background: none;
-    border: none;
-    color: var(--primary-pink);
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 4px;
-    transition: var(--transition);
-}
-
-.use-btn:hover {
-    background: var(--primary-pink);
-    color: var(--white);
-}
-
-/* Scientific Calculator Premium Design */
+/* Scientific Calculator Premium Design - Layout Aprimorado */
 .scientific-calculator {
     background: linear-gradient(135deg, #ffeef3, #fff0f5, #ffeef3);
     border: 3px solid transparent;
@@ -392,24 +313,6 @@ body {
     margin-bottom: 25px;
     overflow: hidden;
     position: relative;
-}
-
-.scientific-calculator::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, var(--primary-pink), var(--deep-pink), #f8bbd0, var(--primary-pink));
-    border-radius: 25px;
-    z-index: -1;
-    animation: borderGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes borderGlow {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
 }
 
 .calculator-header {
@@ -448,19 +351,16 @@ body {
     padding: 25px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 238, 243, 0.8));
     transition: var(--transition);
-}
-
-.calculator-body.collapsed {
-    max-height: 0;
-    padding: 0 20px;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .calc-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
-    margin-bottom: 12px;
+    width: 100%;
 }
 
 .calc-row:last-child {
@@ -672,6 +572,15 @@ body {
     font-size: 0.9rem;
 }
 
+.example-btn.wide-btn {
+    grid-column: span 2;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .example-btn:hover {
     background: linear-gradient(135deg, #ff7043, #ff5722);
     transform: translateY(-3px);
@@ -714,45 +623,7 @@ body {
     font-weight: 700;
 }
 
-/* Charts Container */
-.charts-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin: 30px 0;
-}
-
-.chart-section {
-    background: var(--white);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: var(--shadow-light);
-    border: 2px solid var(--pale-pink);
-}
-
-.chart-section h3 {
-    color: var(--primary-pink);
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    text-align: center;
-}
-
-.chart-section h3 i {
-    margin-right: 8px;
-}
-
-.chart-wrapper {
-    position: relative;
-    height: 400px;
-    width: 100%;
-}
-
-.chart-wrapper canvas {
-    max-height: 100%;
-    max-width: 100%;
-}
-
-/* Parameters Grid */
+/* Parameters Grid - Corrected for mobile alignment */
 .parameters-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1085,115 +956,486 @@ body {
     75% { transform: translateX(5px); }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design - Aprimorado e Otimizado - Melhorias Específicas */
+@media (max-width: 1200px) {
     .container {
+        max-width: 100%;
         padding: 15px;
+    }
+}
+
+@media (min-width: 1800px) {
+    .container {
+        max-width: 1600px;
     }
     
     .title {
-        font-size: 2rem;
+        font-size: 3rem;
     }
     
-    .calculator-form {
-        padding: 25px;
+    .subtitle {
+        font-size: 1.3rem;
     }
     
-    .calc-row {
-        grid-template-columns: repeat(4, 1fr);
+    .calculator-form, .results {
+        padding: 50px;
+        border-radius: 30px;
     }
     
-    .calc-btn {
-        padding: 10px 6px;
-        font-size: 0.9rem;
-        min-height: 40px;
+    .math-preview {
+        padding: 20px 25px;
     }
     
-    .function-display {
-        font-size: 1rem;
-        padding: 12px 15px;
+    .function-label {
+        font-size: 1.5rem;
+    }
+    
+    .math-input {
+        font-size: 1.6rem;
+    }
+    
+    .form-input {
+        padding: 18px 25px;
+        font-size: 1.2rem;
+    }
+    
+    .summary-card {
+        padding: 35px;
+    }
+    
+    .root-value, .function-value, .time-value, .iterations-value {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .parameters-grid {
+        grid-template-columns: 1fr;
     }
     
     .charts-container {
         grid-template-columns: 1fr;
-        gap: 20px;
+    }
+    
+    .chart-wrapper {
+        height: 400px;
+    }
+    
+    .title {
+        font-size: 2.2rem;
+    }
+    
+    .math-preview {
+        padding: 12px 15px;
+        min-height: 55px;
+    }
+    
+    .function-label {
+        font-size: 1.1rem;
+        min-width: 60px;
+    }
+    
+    .math-input {
+        font-size: 1.2rem;
+    }
+    
+    .calculator-body {
+        padding: 18px 15px;
+        gap: 10px;
+    }
+    
+    .calc-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .title {
+        font-size: 1.9rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .calculator-form {
+        padding: 25px 20px;
+    }
+    
+    .math-editor-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .math-preview {
+        padding: 10px 12px;
+        min-height: 50px;
+    }
+    
+    .function-label {
+        font-size: 1rem;
+        min-width: 50px;
+    }
+    
+    .math-input {
+        font-size: 1.1rem;
+    }
+    
+    .calculator-body {
+        padding: 15px 12px;
+        gap: 8px;
+    }
+    
+    .calc-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .calc-btn {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+        min-height: 50px;
+    }
+    
+    /* Botão de exemplo ocupa toda a largura */
+    .example-btn.wide-btn {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 576px) {
+    .header {
+        margin-bottom: 25px;
+    }
+    
+    .title {
+        font-size: 1.6rem;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .calculator-form {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+    
+    .math-editor-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .math-preview {
+        padding: 8px 10px;
+        min-height: 45px;
+        border-radius: 10px;
+    }
+    
+    .function-label {
+        font-size: 0.9rem;
+        min-width: 40px;
+        margin-right: 8px;
+    }
+    
+    .math-input {
+        font-size: 1rem;
+        min-height: 30px;
+    }
+    
+    .calculator-body {
+        padding: 12px 10px;
+        gap: 6px;
+    }
+    
+    .calc-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .calc-btn {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+        min-height: 45px;
+    }
+    
+    /* Botão de exemplo ocupa toda a largura */
+    .example-btn.wide-btn {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Novo breakpoint para dispositivos móveis menores */
+    .title {
+        font-size: 1.4rem;
+    }
+    
+    .subtitle {
+        font-size: 0.85rem;
+    }
+    
+    /* Ajustar os cartões de resumo */
+    .summary-card {
+        padding: 15px;
+    }
+    
+    .summary-card h3 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .root-value, .function-value, .time-value, .iterations-value {
+        font-size: 1.2rem;
+    }
+    
+    /* Reduzir o tamanho do badge de método */
+    .method-badge {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    /* Fixed calculator scientific layout */
+    .calc-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+    
+    /* Ajustar alinhamento dos botões */
+    .calc-btn {
+        padding: 10px 5px;
+        font-size: 0.75rem;
+        min-height: 40px;
+    }
+    
+    /* Botão de exemplo ocupa toda a largura */
+    .example-btn.wide-btn {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 420px) {
+    .calculator-header {
+        padding: 12px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .calculator-body {
+        padding: 10px 8px;
+    }
+    
+    .calc-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .calc-btn {
+        padding: 6px 2px;
+        font-size: 0.65rem;
+        min-height: 32px;
+    }
+    
+    /* Ensure parameters are clearly visible */
+    .form-section {
+        margin-bottom: 15px;
+    }
+    
+    .form-label i {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .calculator-body {
+        padding: 8px 5px;
+    }
+    
+    .calc-btn {
+        min-height: 32px;
+        padding: 6px 3px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+    }
+    
+    /* Simplificar interface em telas muito pequenas */
+    .calculator-header span {
+        font-size: 0.8rem;
+    }
+    
+    /* Assegurar que a calculadora não ultrapasse a tela */
+    .scientific-calculator {
+        margin-left: -5px;
+        margin-right: -5px;
+        border-radius: 15px;
+    }
+    
+    /* Ajustes extremos para dispositivos muito pequenos */
+    .form-input {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .radio-label {
+        padding: 10px;
+    }
+    
+    .math-editor-container {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-height: 450px) and (orientation: landscape) {
+    .calculator-body {
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    
+    .calc-row {
+        margin-bottom: 3px;
+        gap: 3px;
+    }
+    
+    .calc-btn {
+        min-height: 30px;
+        padding: 5px;
+    }
+    
+    /* Melhorar a experiência em landscape */
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
+    
+    .header {
+        margin-bottom: 15px;
+    }
+    
+    .title {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+    
+    .subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .calculator-form {
+        padding: 15px;
+    }
+    
+    .form-section {
+        margin-bottom: 15px;
+    }
+    
+    /* Adaptar layout para aproveitar o espaço horizontal */
+    .parameters-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    
+    .params-group.active {
+        grid-column: span 2;
+    }
+    
+    /* Tornar os resultados mais compactos */
+    .results {
+        padding: 20px;
+    }
+    
+    .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    
+    .summary-card {
+        padding: 15px;
+    }
+    
+    .chart-wrapper {
+        height: 180px;
+    }
+}
+
+/* Dispositivos de alta definição (tablets grandes em landscape) */
+@media (min-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
+    .calculator-form {
+        max-width: 95%;
+        margin: 0 auto;
+    }
+    
+    .parameters-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr 1fr;
     }
     
     .chart-wrapper {
         height: 300px;
     }
-    
+}
+
+/* Suporte para dispositivos com telas dobráveis */
+@media (min-width: 768px) and (max-width: 880px) {
     .parameters-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .charts-container {
         grid-template-columns: 1fr;
-    }
-    
-    .params-group {
-        grid-template-columns: 1fr;
-    }
-    
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .results-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .results {
-        padding: 25px;
-    }
-    
-    .iterations-table {
-        font-size: 0.85rem;
-    }
-    
-    .iterations-table th,
-    .iterations-table td {
-        padding: 8px 6px;
     }
 }
 
-@media (max-width: 480px) {
-    .title {
-        font-size: 1.8rem;
+/* Suporte para dispositivos com display de alta resolução */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .title, .method-badge, .chart-section h3, .iterations-table-container h3 {
+        text-shadow: 0 1px 2px rgba(236, 64, 122, 0.15);
     }
     
-    .title i {
-        margin: 0 8px;
+    .table-wrapper, .math-editor-container, .scientific-calculator {
+        box-shadow: 0 8px 24px rgba(236, 64, 122, 0.12);
     }
-    
-    .calculator-form {
-        padding: 20px;
+}
+
+/* Classes utilitárias para ajustes específicos */
+.responsive-hide-sm {
+    display: initial;
+}
+
+@media (max-width: 576px) {
+    .responsive-hide-sm {
+        display: none;
     }
-    
-    .math-buttons {
-        grid-template-columns: repeat(3, 1fr);
+}
+
+.responsive-text-center {
+    text-align: inherit;
+}
+
+@media (max-width: 768px) {
+    .responsive-text-center {
+        text-align: center;
     }
-    
-    .math-btn {
-        padding: 6px 8px;
-        font-size: 0.8rem;
-    }
-    
-    .form-input {
-        padding: 12px 15px;
-    }
-    
-    .calculate-btn {
-        padding: 15px 25px;
-        font-size: 1.1rem;
-    }
-    
-    .radio-label {
-        padding: 15px;
-    }
-    
-    .summary-card {
-        padding: 20px;
-    }
-    
-    .iterations-table {
-        min-width: 500px;
+}
+
+/* Melhorias para acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

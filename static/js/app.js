@@ -10,10 +10,8 @@ const results = document.getElementById('results');
 const error = document.getElementById('error');
 const limitFields = document.querySelectorAll('.limit-field');
 
-// Function expression storage
+// Remover variáveis relacionadas aos gráficos que não são mais usadas
 let currentFunction = '';
-let functionChart = null;
-let convergenceChart = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -159,6 +157,19 @@ async function handleFormSubmit(event) {
             showError('O limite inferior (a) deve ser menor que o limite superior (b)');
             return;
         }
+        
+        // Verificar se f(a) e f(b) têm sinais opostos (importante para garantir a convergência)
+        try {
+            const fa = evaluateFunction(data.function, data.a);
+            const fb = evaluateFunction(data.function, data.b);
+            
+            if (fa * fb >= 0) {
+                showError('Os valores de f(a) e f(b) devem ter sinais opostos para o método da Falsa Posição');
+                return;
+            }
+        } catch (err) {
+            console.error('Erro ao avaliar função:', err);
+        }
     } else {
         data.x0 = parseFloat(formData.get('x0'));
     }
@@ -262,8 +273,8 @@ function displayResults(result) {
     methodBadge.textContent = result.method;
     
     // Update summary cards
-    document.getElementById('rootValue').textContent = result.root;
-    document.getElementById('functionValue').textContent = result.function_value;
+    document.getElementById('rootValue').textContent = formatNumber(result.root);
+    document.getElementById('functionValue').textContent = formatNumber(result.function_value);
     document.getElementById('timeValue').textContent = `${result.execution_time}s`;
     document.getElementById('iterationsValue').textContent = result.total_iterations;
     
@@ -280,14 +291,13 @@ function displayResults(result) {
     // Build iterations table
     buildIterationsTable(result);
     
-    // Create charts
-    createCharts(result);
+    // Não precisamos mais chamar createCharts aqui
     
     // Show results with animation
     results.classList.remove('hidden');
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Update current function for charts
+    // Update current function for future use
     currentFunction = getCurrentFunction();
 }
 
@@ -305,10 +315,10 @@ function buildIterationsTable(result) {
     
     if (result.method === 'Newton-Raphson') {
         // Newton-Raphson headers following theory format
-        headers = ['i', 'xi', 'xi+1', 'f(xi)', "f'(xi)", 'Erro Absoluto', 'Erro Relativo (%)'];
+        headers = ['i', 'xi', 'xi+1', 'f(xi)', "f'(xi)", 'Erro Absoluto', 'Erro Relativo'];
     } else {
         // False Position headers
-        headers = ['Iteração', 'x', 'f(x)', 'Erro Absoluto', 'Erro Relativo'];
+        headers = ['Iteração', 'a', 'b', 'x', 'f(a)', 'f(b)', 'f(x)', 'Erro Absoluto', 'Erro Relativo'];
     }
     
     headers.forEach(header => {
@@ -333,65 +343,131 @@ function buildIterationsTable(result) {
             
             // xi value
             const xiCell = document.createElement('td');
-            xiCell.textContent = iteration.xi;
+            xiCell.textContent = formatNumber(iteration.xi);
             row.appendChild(xiCell);
             
             // xi+1 value
             const xiPlusOneCell = document.createElement('td');
-            xiPlusOneCell.textContent = iteration.xi_plus_1;
+            xiPlusOneCell.textContent = formatNumber(iteration.xi_plus_1);
             row.appendChild(xiPlusOneCell);
             
             // f(xi) value
             const fxiCell = document.createElement('td');
-            fxiCell.textContent = iteration.fxi;
+            fxiCell.textContent = formatNumber(iteration.fxi);
             row.appendChild(fxiCell);
             
             // f'(xi) value
             const dfxiCell = document.createElement('td');
-            dfxiCell.textContent = iteration.dfxi;
+            dfxiCell.textContent = formatNumber(iteration.dfxi);
             row.appendChild(dfxiCell);
             
             // Absolute error
             const absErrorCell = document.createElement('td');
-            absErrorCell.textContent = iteration.absolute_error;
+            absErrorCell.textContent = formatNumber(iteration.absolute_error);
             row.appendChild(absErrorCell);
             
-            // Relative error (%)
+            // Relative error (without %)
             const relErrorCell = document.createElement('td');
-            relErrorCell.textContent = iteration.relative_error_percent + '%';
+            relErrorCell.textContent = formatNumber(iteration.relative_error_percent);
             row.appendChild(relErrorCell);
             
         } else {
-            // False Position table format (existing)
+            // False Position table format com verificação de dados
             
             // Iteration number
             const iterationCell = document.createElement('td');
             iterationCell.textContent = iteration.iteration;
             row.appendChild(iterationCell);
             
-            // x value
+            // a value
+            const aCell = document.createElement('td');
+            aCell.textContent = formatNumber(iteration.a);
+            row.appendChild(aCell);
+            
+            // b value
+            const bCell = document.createElement('td');
+            bCell.textContent = formatNumber(iteration.b);
+            row.appendChild(bCell);
+            
+            // x value (xr - ponto onde a reta corta o eixo x)
             const xCell = document.createElement('td');
-            xCell.textContent = iteration.x;
+            xCell.textContent = formatNumber(iteration.x);
+            if (index > 0) {
+                // Verificar se x está consistente com a fórmula
+                const prevIteration = result.iterations[index-1];
+                const x_expected = calculateFalsePositionX(prevIteration.a, prevIteration.b, prevIteration.fa, prevIteration.fb);
+                if (Math.abs(x_expected - iteration.x) > 0.0001) {
+                    xCell.title = `Valor esperado pela fórmula: ${formatNumber(x_expected)}`;
+                    xCell.style.color = 'red';
+                }
+            }
             row.appendChild(xCell);
+            
+            // f(a) value
+            const faCell = document.createElement('td');
+            faCell.textContent = formatNumber(iteration.fa);
+            row.appendChild(faCell);
+            
+            // f(b) value
+            const fbCell = document.createElement('td');
+            fbCell.textContent = formatNumber(iteration.fb);
+            row.appendChild(fbCell);
             
             // f(x) value
             const fxCell = document.createElement('td');
-            fxCell.textContent = iteration.fx;
+            fxCell.textContent = formatNumber(iteration.fx);
             row.appendChild(fxCell);
             
             // Absolute error
             const absErrorCell = document.createElement('td');
-            absErrorCell.textContent = iteration.absolute_error;
+            absErrorCell.textContent = formatNumber(iteration.absolute_error);
             row.appendChild(absErrorCell);
             
             // Relative error
             const relErrorCell = document.createElement('td');
-            relErrorCell.textContent = iteration.relative_error;
+            relErrorCell.textContent = formatNumber(iteration.relative_error);
             row.appendChild(relErrorCell);
         }
         
         tableBody.appendChild(row);
     });
+}
+
+// Adicionar uma função para verificar o cálculo do x no método da falsa posição
+function calculateFalsePositionX(a, b, fa, fb) {
+    // Implementando a fórmula da Falsa Posição de forma mais clara:
+    // xr = (a*f(b) - b*f(a))/(f(b) - f(a))
+    return (a*fb - b*fa) / (fb - fa);
+}
+
+// Implementar a função evaluateFunction completa para avaliação de funções
+function evaluateFunction(func, x) {
+    // Simple function evaluator for common mathematical expressions
+    let expression = func;
+    
+    // Replace mathematical constants and functions
+    expression = expression.replace(/\bpi\b/g, Math.PI);
+    expression = expression.replace(/\be\b/g, Math.E);
+    expression = expression.replace(/\^/g, '**');
+    expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
+    expression = expression.replace(/sin\(/g, 'Math.sin(');
+    expression = expression.replace(/cos\(/g, 'Math.cos(');
+    expression = expression.replace(/tan\(/g, 'Math.tan(');
+    expression = expression.replace(/log\(/g, 'Math.log(');
+    expression = expression.replace(/exp\(/g, 'Math.exp(');
+    expression = expression.replace(/\bx\b/g, x);
+    
+    // Adicionando validações extras
+    if (expression.includes('undefined') || expression.includes('NaN')) {
+        return NaN;
+    }
+    
+    // Evaluate safely
+    try {
+        return Function('"use strict"; return (' + expression + ')')();
+    } catch (e) {
+        return NaN;
+    }
 }
 
 function showError(message) {
@@ -412,441 +488,33 @@ function hideError() {
 
 function hideResults() {
     results.classList.add('hidden');
-    // Destroy existing charts
-    if (functionChart) {
-        functionChart.destroy();
-        functionChart = null;
-    }
-    if (convergenceChart) {
-        convergenceChart.destroy();
-        convergenceChart = null;
-    }
+    // Não precisamos mais limpar gráficos que não existem
 }
 
-function createCharts(result) {
-    createFunctionChart(result);
-    createConvergenceChart(result);
-}
-
-function createFunctionChart(result) {
-    const ctx = document.getElementById('functionChart');
-    if (!ctx) return;
-
-    // Destroy existing chart
-    if (functionChart) {
-        functionChart.destroy();
-    }
-
-    // Generate function data points
-    const functionData = generateFunctionData(result);
+// Função para formatar números que pode ser usada globalmente
+function formatNumber(num) {
+    if (num === undefined || num === null || num === 'N/A') return 'N/A';
     
-    functionChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'f(x)',
-                    data: functionData.points,
-                    borderColor: 'rgb(236, 64, 122)',
-                    backgroundColor: 'rgba(236, 64, 122, 0.05)',
-                    borderWidth: 4,
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Eixo y = 0',
-                    data: functionData.zeroLine,
-                    borderColor: 'rgba(100, 100, 100, 0.8)',
-                    backgroundColor: 'rgba(100, 100, 100, 0.1)',
-                    borderWidth: 2,
-                    borderDash: [8, 4],
-                    fill: false,
-                    pointRadius: 0
-                },
-                {
-                    label: '🎯 Raiz Encontrada',
-                    data: [{ x: result.root, y: 0 }],
-                    backgroundColor: 'rgb(255, 193, 7)',
-                    borderColor: 'rgb(255, 152, 0)',
-                    borderWidth: 4,
-                    pointRadius: 12,
-                    pointHoverRadius: 15,
-                    showLine: false,
-                    pointStyle: 'star'
-                },
-                ...generateIterationPoints(result)
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: `📊 Gráfico da Função: ${currentFunction}`,
-                    font: { size: 18, weight: 'bold', family: 'Poppins' },
-                    color: 'rgb(236, 64, 122)',
-                    padding: 20
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20,
-                        font: { size: 12, weight: '600' },
-                        color: 'rgb(85, 85, 85)'
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: 'rgb(236, 64, 122)',
-                    bodyColor: 'rgb(85, 85, 85)',
-                    borderColor: 'rgb(236, 64, 122)',
-                    borderWidth: 2,
-                    cornerRadius: 8,
-                    displayColors: true,
-                    callbacks: {
-                        title: function(context) {
-                            return `x = ${context[0].parsed.x.toFixed(6)}`;
-                        },
-                        label: function(context) {
-                            return `${context.dataset.label}: ${context.parsed.y.toFixed(6)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    type: 'linear',
-                    title: {
-                        display: true,
-                        text: 'x',
-                        font: { size: 14, weight: 'bold' },
-                        color: 'rgb(236, 64, 122)'
-                    },
-                    grid: {
-                        color: 'rgba(236, 64, 122, 0.1)',
-                        lineWidth: 1
-                    },
-                    ticks: {
-                        color: 'rgb(85, 85, 85)',
-                        font: { weight: '600' }
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'f(x)',
-                        font: { size: 14, weight: 'bold' },
-                        color: 'rgb(236, 64, 122)'
-                    },
-                    grid: {
-                        color: 'rgba(236, 64, 122, 0.1)',
-                        lineWidth: 1
-                    },
-                    ticks: {
-                        color: 'rgb(85, 85, 85)',
-                        font: { weight: '600' }
-                    }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            animation: {
-                duration: 1500,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
-}
-
-function createConvergenceChart(result) {
-    const ctx = document.getElementById('convergenceChart');
-    if (!ctx) return;
-
-    // Destroy existing chart
-    if (convergenceChart) {
-        convergenceChart.destroy();
-    }
-
-    const convergenceData = generateConvergenceData(result);
+    // Convert to number if it's a string
+    let value = typeof num === 'string' ? parseFloat(num) : num;
     
-    convergenceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: '📈 Aproximação de x',
-                    data: convergenceData.xValues,
-                    borderColor: 'rgb(33, 150, 243)',
-                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                    borderWidth: 4,
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    pointBackgroundColor: 'rgb(33, 150, 243)',
-                    pointBorderColor: 'white',
-                    pointBorderWidth: 2,
-                    yAxisID: 'y'
-                },
-                {
-                    label: '📉 Erro Relativo (%)',
-                    data: convergenceData.errors,
-                    borderColor: 'rgb(255, 152, 0)',
-                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: 'rgb(255, 152, 0)',
-                    pointBorderColor: 'white',
-                    pointBorderWidth: 2,
-                    yAxisID: 'y1'
-                },
-                {
-                    label: '🎯 Raiz Exata',
-                    data: convergenceData.trueLine,
-                    borderColor: 'rgba(76, 175, 80, 0.9)',
-                    backgroundColor: 'rgba(76, 175, 80, 0.05)',
-                    borderWidth: 3,
-                    borderDash: [10, 5],
-                    fill: false,
-                    pointRadius: 0,
-                    yAxisID: 'y'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: `📊 Análise de Convergência - ${result.method}`,
-                    font: { size: 18, weight: 'bold', family: 'Poppins' },
-                    color: 'rgb(236, 64, 122)',
-                    padding: 20
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20,
-                        font: { size: 12, weight: '600' },
-                        color: 'rgb(85, 85, 85)'
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: 'rgb(236, 64, 122)',
-                    bodyColor: 'rgb(85, 85, 85)',
-                    borderColor: 'rgb(236, 64, 122)',
-                    borderWidth: 2,
-                    cornerRadius: 8,
-                    displayColors: true,
-                    callbacks: {
-                        title: function(context) {
-                            return `Iteração ${context[0].label}`;
-                        },
-                        label: function(context) {
-                            if (context.dataset.label.includes('Erro')) {
-                                return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}%`;
-                            } else {
-                                return `${context.dataset.label}: ${context.parsed.y.toFixed(8)}`;
-                            }
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Número da Iteração',
-                        font: { size: 14, weight: 'bold' },
-                        color: 'rgb(236, 64, 122)'
-                    },
-                    grid: {
-                        color: 'rgba(236, 64, 122, 0.1)',
-                        lineWidth: 1
-                    },
-                    ticks: {
-                        color: 'rgb(85, 85, 85)',
-                        font: { weight: '600' }
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Valor de x',
-                        font: { size: 14, weight: 'bold' },
-                        color: 'rgb(33, 150, 243)'
-                    },
-                    grid: {
-                        color: 'rgba(33, 150, 243, 0.1)',
-                        lineWidth: 1
-                    },
-                    ticks: {
-                        color: 'rgb(33, 150, 243)',
-                        font: { weight: '600' }
-                    }
-                },
-                y1: {
-                    type: 'logarithmic',
-                    display: true,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Erro Relativo (% - escala log)',
-                        font: { size: 14, weight: 'bold' },
-                        color: 'rgb(255, 152, 0)'
-                    },
-                    grid: {
-                        drawOnChartArea: false
-                    },
-                    ticks: {
-                        color: 'rgb(255, 152, 0)',
-                        font: { weight: '600' },
-                        callback: function(value) {
-                            if (value === 0.01 || value === 0.1 || value === 1 || value === 10 || value === 100) {
-                                return value + '%';
-                            }
-                            return '';
-                        }
-                    }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            animation: {
-                duration: 1500,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
-}
-
-function generateFunctionData(result) {
-    // Calculate range around the root
-    const root = result.root;
-    const range = Math.max(2, Math.abs(root) * 0.5);
-    const xMin = root - range;
-    const xMax = root + range;
-    const numPoints = 200;
-    const step = (xMax - xMin) / numPoints;
+    if (isNaN(value)) return 'N/A';
     
-    const points = [];
-    const zeroLine = [];
-    
-    // Generate function points using simple evaluation
-    for (let i = 0; i <= numPoints; i++) {
-        const x = xMin + i * step;
-        try {
-            // Simple function evaluation for common cases
-            let y = evaluateFunction(currentFunction, x);
-            
-            if (isFinite(y) && Math.abs(y) < 1000) {
-                points.push({ x: x, y: y });
-            }
-        } catch (e) {
-            // Skip problematic points
-        }
-        zeroLine.push({ x: x, y: 0 });
-    }
-    
-    return { points, zeroLine };
-}
-
-function generateIterationPoints(result) {
-    const points = [];
-    
-    if (result.method === 'Newton-Raphson') {
-        // Show Newton-Raphson iteration points
-        result.iterations.forEach((iter, index) => {
-            points.push({
-                label: `Iteração ${index}`,
-                data: [{ x: iter.xi, y: iter.fxi }],
-                backgroundColor: `hsl(${index * 30}, 70%, 50%)`,
-                borderColor: `hsl(${index * 30}, 70%, 40%)`,
-                pointRadius: 5,
-                showLine: false
-            });
-        });
+    // Format based on the magnitude of the number
+    let formattedValue;
+    if (Math.abs(value) < 0.001 && value !== 0) {
+        // Scientific notation for very small numbers
+        const expFormat = value.toExponential(1);
+        // Replace dot with comma and "e-" with "E-"
+        formattedValue = expFormat.replace('.', ',').replace('e-', 'E-');
     } else {
-        // Show False Position interval progression
-        result.iterations.forEach((iter, index) => {
-            points.push({
-                label: `Iteração ${index + 1}`,
-                data: [{ x: iter.x, y: iter.fx }],
-                backgroundColor: `hsl(${index * 20}, 60%, 50%)`,
-                borderColor: `hsl(${index * 20}, 60%, 40%)`,
-                pointRadius: 4,
-                showLine: false
-            });
-        });
+        // Regular format with 5 decimal places
+        formattedValue = value.toFixed(5).replace('.', ',');
+        // Remove trailing zeros
+        formattedValue = formattedValue.replace(/,?0+$/, '');
     }
     
-    return points;
-}
-
-function generateConvergenceData(result) {
-    const xValues = [];
-    const errors = [];
-    const trueLine = [];
-    
-    result.iterations.forEach((iter, index) => {
-        if (result.method === 'Newton-Raphson') {
-            xValues.push({ x: index, y: iter.xi_plus_1 });
-            if (iter.relative_error_percent !== 'N/A') {
-                errors.push({ x: index, y: parseFloat(iter.relative_error_percent) });
-            }
-        } else {
-            xValues.push({ x: index, y: iter.x });
-            if (iter.relative_error !== 'N/A') {
-                errors.push({ x: index, y: parseFloat(iter.relative_error) * 100 });
-            }
-        }
-        trueLine.push({ x: index, y: result.root });
-    });
-    
-    return { xValues, errors, trueLine };
-}
-
-function evaluateFunction(func, x) {
-    // Simple function evaluator for common mathematical expressions
-    let expression = func;
-    
-    // Replace mathematical constants and functions
-    expression = expression.replace(/\bpi\b/g, Math.PI);
-    expression = expression.replace(/\be\b/g, Math.E);
-    expression = expression.replace(/\^/g, '**');
-    expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
-    expression = expression.replace(/sin\(/g, 'Math.sin(');
-    expression = expression.replace(/cos\(/g, 'Math.cos(');
-    expression = expression.replace(/tan\(/g, 'Math.tan(');
-    expression = expression.replace(/log\(/g, 'Math.log(');
-    expression = expression.replace(/exp\(/g, 'Math.exp(');
-    expression = expression.replace(/\bx\b/g, x);
-    
-    // Evaluate safely
-    try {
-        return Function('"use strict"; return (' + expression + ')')();
-    } catch (e) {
-        return NaN;
-    }
+    return formattedValue;
 }
 
 // Add some mathematical function examples on focus

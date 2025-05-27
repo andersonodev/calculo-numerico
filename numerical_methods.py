@@ -32,8 +32,9 @@ def parse_function(function_str: str):
 
 def false_position(function_str: str, a: float, b: float, tolerance: float, max_iterations: int) -> Dict[str, Any]:
     """
-    Implement the False Position (Regula Falsi) method
-    Formula: xr = b - f(b)(a-b)/(f(a)-f(b))
+    Implement the False Position (Regula Falsi) method with Illinois modification
+    Formula: xr = (a*f(b) - b*f(a))/(f(b) - f(a))
+    Illinois modification: If an endpoint is stagnant, its function value is halved.
     """
     start_time = time.time()
     
@@ -44,18 +45,26 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
         fa = f(a)
         fb = f(b)
         
-        if fa * fb > 0:
+        if fa * fb >= 0:
             raise ValueError("A função deve ter sinais opostos nos pontos a e b para garantir a existência de uma raiz no intervalo")
         
         iterations = []
-        xr_old = 0
-        xr = 0
-        fxr = 0
+        xr_old = None
+        xr = a  # Inicializar com um valor razoável
+        fxr = fa
         relative_error = float('inf')
         
+        # Variables for Illinois modification
+        last_side_updated = None # None, 'a', or 'b'
+        stagnant_count_a = 0
+        stagnant_count_b = 0
+
         for i in range(max_iterations):
+            # Save previous approximation
+            xr_old = xr
+            
             # Calculate new approximation using False Position formula
-            xr = b - (fb * (a - b)) / (fa - fb)
+            xr = (a*fb - b*fa) / (fb - fa)
             fxr = f(xr)
             
             # Calculate errors
@@ -66,37 +75,55 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
                 absolute_error = float('inf')
                 relative_error = float('inf')
             
-            # Store iteration data
             iterations.append({
                 'iteration': i + 1,
-                'x': round(xr, 8),
-                'fx': round(fxr, 8),
-                'absolute_error': round(absolute_error, 8) if absolute_error != float('inf') else 'N/A',
-                'relative_error': round(relative_error, 8) if relative_error != float('inf') else 'N/A'
+                'a': float(a),
+                'b': float(b),
+                'x': float(xr),
+                'fa': float(fa), 
+                'fb': float(fb),
+                'fx': float(fxr),
+                'absolute_error': float(absolute_error) if absolute_error != float('inf') else 'N/A',
+                'relative_error': float(relative_error) if relative_error != float('inf') else 'N/A'
             })
             
-            # Check convergence - using relative error as percentage
-            if i > 0 and relative_error <= tolerance / 100.0:
+            if abs(fxr) < tolerance or (i > 0 and relative_error < tolerance):
                 break
             
             # Update interval based on sign of f(a) * f(xr)
             if fa * fxr < 0:
                 b = xr
+                # Illinois modification: if 'a' was stagnant, halve fa
+                if last_side_updated == 'b': # 'a' was stagnant
+                    stagnant_count_a +=1
+                    if stagnant_count_a >= 2:
+                        fa /= 2
+                else:
+                    stagnant_count_a = 0 # reset counter if 'a' was not stagnant
+                last_side_updated = 'b' # 'b' is the side that just moved
                 fb = fxr
+                stagnant_count_b = 0 # reset counter for b as it moved
             else:
                 a = xr
+                # Illinois modification: if 'b' was stagnant, halve fb
+                if last_side_updated == 'a': # 'b' was stagnant
+                    stagnant_count_b +=1
+                    if stagnant_count_b >= 2:
+                        fb /= 2
+                else:
+                    stagnant_count_b = 0 # reset counter if 'b' was not stagnant
+                last_side_updated = 'a' # 'a' is the side that just moved
                 fa = fxr
-            
-            xr_old = xr
+                stagnant_count_a = 0 # reset counter for a as it moved
         
         execution_time = time.time() - start_time
         
         return {
-            'method': 'Falsa Posição (Regula Falsi)',
-            'root': round(xr, 8),
-            'function_value': round(fxr, 8),
+            'method': 'Falsa Posição (Illinois)', # Updated method name
+            'root': float(xr),
+            'function_value': float(fxr),
             'iterations': iterations,
-            'converged': relative_error <= tolerance,
+            'converged': abs(fxr) < tolerance or relative_error < tolerance,
             'execution_time': round(execution_time, 6),
             'total_iterations': len(iterations)
         }

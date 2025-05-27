@@ -19,11 +19,10 @@
     <div class="container">
         <header class="header">
             <h1 class="title">
-                <i class="fas fa-heart"></i>
-                Calculadora de Raízes Numéricas
                 <i class="fas fa-brain"></i>
+                Modelagem Computacional Bem Feminina
             </h1>
-            <p class="subtitle">Métodos de Falsa Posição e Newton-Raphson com estilo feminino</p>
+            <p class="subtitle">Métodos de Falsa Posição e Newton-Raphson</p>
         </header>
 
         <main class="main-content">
@@ -38,40 +37,11 @@
                     <div class="math-editor-container">
                         <div class="math-preview">
                             <span class="function-label">f(x) = </span>
-                            <math-field id="mathEditor" class="math-input">
-                                x^2 + 2x + 1
-                            </math-field>
+                            <math-field id="mathEditor" class="math-input"></math-field>
                         </div>
                         
                         <!-- Input oculto para o formulário -->
                         <input type="hidden" id="function" name="function" required>
-                        
-                        <!-- Histórico de Expressões -->
-                        <div class="expression-history" id="expressionHistory">
-                            <div class="history-header">
-                                <i class="fas fa-history"></i> Histórico
-                            </div>
-                            <div class="history-items" id="historyItems">
-                                <div class="history-item" data-expression="x^3 - x - 2">
-                                    <span class="expression">x³ - x - 2</span>
-                                    <button class="use-btn" title="Usar esta expressão">
-                                        <i class="fas fa-arrow-up"></i>
-                                    </button>
-                                </div>
-                                <div class="history-item" data-expression="sin(x) - 0.5">
-                                    <span class="expression">sin(x) - 0.5</span>
-                                    <button class="use-btn" title="Usar esta expressão">
-                                        <i class="fas fa-arrow-up"></i>
-                                    </button>
-                                </div>
-                                <div class="history-item" data-expression="exp(x) - 2">
-                                    <span class="expression">e^x - 2</span>
-                                    <button class="use-btn" title="Usar esta expressão">
-                                        <i class="fas fa-arrow-up"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     
                     <!-- Calculadora Científica Interativa -->
@@ -176,11 +146,8 @@
                                 <button type="button" class="calc-btn num-btn" data-latex="3">3</button>
                                 <button type="button" class="calc-btn num-btn" data-latex="0">0</button>
                                 <button type="button" class="calc-btn num-btn" data-latex=".">.</button>
-                                <button type="button" class="calc-btn validate-btn" id="validateBtn" title="Validar expressão">
-                                    <i class="fas fa-check"></i> OK
-                                </button>
-                                <button type="button" class="calc-btn example-btn" id="exampleBtn" title="Inserir exemplo">
-                                    <i class="fas fa-lightbulb"></i>
+                                <button type="button" class="calc-btn example-btn wide-btn" id="exampleBtn" title="Inserir exemplo">
+                                    <i class="fas fa-lightbulb"></i> Exemplo
                                 </button>
                             </div>
                         </div>
@@ -319,23 +286,8 @@
 
                 <div class="convergence-info" id="convergenceInfo"></div>
 
-                <!-- Gráficos -->
-                <div class="charts-container">
-                    <div class="chart-section">
-                        <h3><i class="fas fa-chart-line"></i> Gráfico da Função</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="functionChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-section">
-                        <h3><i class="fas fa-bullseye"></i> Convergência do Método</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="convergenceChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- Gráficos - REMOVIDOS CONFORME SOLICITADO -->
+                
                 <div class="iterations-table-container">
                     <h3><i class="fas fa-table"></i> Tabela de Iterações</h3>
                     <div class="table-wrapper">

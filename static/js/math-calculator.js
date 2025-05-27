@@ -2,7 +2,6 @@
 class MathCalculator {
     constructor() {
         this.mathField = null;
-        this.expressionHistory = [];
         this.isCalculatorCollapsed = false;
         this.init();
     }
@@ -11,9 +10,7 @@ class MathCalculator {
         this.setupMathField();
         this.setupCalculatorButtons();
         this.setupToggleCalculator();
-        this.setupHistoryButtons();
         this.setupValidation();
-        this.loadExpressionHistory();
     }
 
     setupMathField() {
@@ -34,8 +31,8 @@ class MathCalculator {
             // Configure MathLive
             this.mathField = mathEditor;
             
-            // Set initial value
-            this.mathField.value = 'x^2 + 2x + 1';
+            // Set initial value (remove default value)
+            this.mathField.value = '';
             
             // Configure MathLive options (modern syntax)
             this.mathField.mathVirtualKeyboardPolicy = 'off';
@@ -68,7 +65,7 @@ class MathCalculator {
         fallbackInput.id = 'mathEditor';
         fallbackInput.className = 'math-input fallback-input';
         fallbackInput.placeholder = 'Digite sua função: ex: x^2 + 2*x + 1';
-        fallbackInput.value = 'x^2 + 2*x + 1';
+        fallbackInput.value = ''; // Remove default value
         
         // Replace the math-field with regular input
         mathEditor.parentNode.replaceChild(fallbackInput, mathEditor);
@@ -120,8 +117,6 @@ class MathCalculator {
                 this.clearExpression();
             } else if (button.id === 'backspaceBtn') {
                 this.backspace();
-            } else if (button.id === 'validateBtn') {
-                this.validateExpression();
             } else if (button.id === 'exampleBtn') {
                 this.insertExample();
             }
@@ -141,6 +136,12 @@ class MathCalculator {
 
         if (!toggleBtn || !calculatorBody) return;
 
+        // Iniciar com calculadora fechada por padrão
+        this.isCalculatorCollapsed = true;
+        calculatorBody.style.maxHeight = '0';
+        calculatorBody.style.padding = '0 20px';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+
         calculatorHeader.addEventListener('click', () => {
             this.isCalculatorCollapsed = !this.isCalculatorCollapsed;
             
@@ -152,23 +153,6 @@ class MathCalculator {
                 calculatorBody.style.maxHeight = 'none';
                 calculatorBody.style.padding = '20px';
                 toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
-            }
-        });
-    }
-
-    setupHistoryButtons() {
-        const historyItems = document.getElementById('historyItems');
-        if (!historyItems) return;
-
-        historyItems.addEventListener('click', (e) => {
-            const useBtn = e.target.closest('.use-btn');
-            if (!useBtn) return;
-
-            const historyItem = useBtn.closest('.history-item');
-            const expression = historyItem.getAttribute('data-expression');
-            
-            if (expression) {
-                this.setExpression(expression);
             }
         });
     }
@@ -190,17 +174,28 @@ class MathCalculator {
         
         switch (latex) {
             case '^{2}':
-                this.mathField.executeCommand('moveToMathFieldEnd');
-                this.mathField.executeCommand('moveToPreviousChar');
-                this.mathField.insert('^2');
+                // Inserir x² se não houver seleção ou aplicar à seleção atual
+                if (this.mathField.selectionIsCollapsed) {
+                    this.mathField.insert('x^2');
+                } else {
+                    this.mathField.insert('^2');
+                }
                 break;
             case '^{3}':
-                this.mathField.executeCommand('moveToMathFieldEnd');
-                this.mathField.executeCommand('moveToPreviousChar');
-                this.mathField.insert('^3');
+                // Inserir x³ se não houver seleção ou aplicar à seleção atual
+                if (this.mathField.selectionIsCollapsed) {
+                    this.mathField.insert('x^3');
+                } else {
+                    this.mathField.insert('^3');
+                }
                 break;
             case '^{\\placeholder{}}':
-                this.mathField.insert('^{#?}');
+                // Melhorar inserção de potência genérica
+                if (this.mathField.selectionIsCollapsed) {
+                    this.mathField.insert('x^{#?}');
+                } else {
+                    this.mathField.insert('^{#?}');
+                }
                 break;
             case '\\sin\\left(\\right)':
                 this.mathField.insert('\\sin(#?)');
@@ -432,7 +427,6 @@ class MathCalculator {
         try {
             const node = math.parse(expression);
             this.showNotification('Expressão válida! ✓', 'success');
-            this.addToHistory(expression);
             return true;
         } catch (error) {
             this.showNotification('Expressão inválida: ' + error.message, 'error');
@@ -455,68 +449,6 @@ class MathCalculator {
         const randomExample = examples[Math.floor(Math.random() * examples.length)];
         this.setExpression(randomExample);
         this.showNotification('Exemplo inserido!', 'info');
-    }
-
-    addToHistory(expression) {
-        if (!this.expressionHistory.includes(expression)) {
-            this.expressionHistory.unshift(expression);
-            if (this.expressionHistory.length > 5) {
-                this.expressionHistory.pop();
-            }
-            this.saveExpressionHistory();
-            this.updateHistoryDisplay();
-        }
-    }
-
-    loadExpressionHistory() {
-        try {
-            const saved = localStorage.getItem('mathCalculatorHistory');
-            if (saved) {
-                this.expressionHistory = JSON.parse(saved);
-                this.updateHistoryDisplay();
-            }
-        } catch (error) {
-            console.log('Could not load history');
-        }
-    }
-
-    saveExpressionHistory() {
-        try {
-            localStorage.setItem('mathCalculatorHistory', JSON.stringify(this.expressionHistory));
-        } catch (error) {
-            console.log('Could not save history');
-        }
-    }
-
-    updateHistoryDisplay() {
-        const historyItems = document.getElementById('historyItems');
-        if (!historyItems) return;
-
-        historyItems.innerHTML = '';
-        
-        this.expressionHistory.forEach(expression => {
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.setAttribute('data-expression', expression);
-            
-            historyItem.innerHTML = `
-                <span class="expression">${this.formatExpressionForDisplay(expression)}</span>
-                <button class="use-btn" title="Usar esta expressão">
-                    <i class="fas fa-arrow-up"></i>
-                </button>
-            `;
-            
-            historyItems.appendChild(historyItem);
-        });
-    }
-
-    formatExpressionForDisplay(expression) {
-        let display = expression;
-        display = display.replace(/\*\*/g, '^');
-        display = display.replace(/\*/g, '×');
-        display = display.replace(/sqrt/g, '√');
-        display = display.replace(/pi/g, 'π');
-        return display;
     }
 
     showNotification(message, type = 'info') {
