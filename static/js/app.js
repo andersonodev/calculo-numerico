@@ -8,9 +8,7 @@ const newtonInfo = document.getElementById('newton-info');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
 const error = document.getElementById('error');
-const functionDisplay = document.getElementById('functionDisplay');
-const functionContent = document.getElementById('functionContent');
-const hiddenInput = document.getElementById('function');
+const limitFields = document.querySelectorAll('.limit-field');
 
 // Function expression storage
 let currentFunction = '';

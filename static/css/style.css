@@ -239,68 +239,167 @@ body {
     color: var(--text-dark);
 }
 
-/* Function Input Container */
-.function-input-container {
-    position: relative;
+/* Math Editor Container */
+.math-editor-container {
+    background: linear-gradient(135deg, var(--pale-pink), var(--white));
+    border: 2px solid var(--medium-pink);
+    border-radius: 20px;
+    padding: 25px;
     margin-bottom: 20px;
+    box-shadow: var(--shadow-medium);
 }
 
-.function-display {
-    background: var(--white);
-    border: 2px solid var(--medium-gray);
-    border-radius: 12px;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    min-height: 50px;
-    font-size: 1.2rem;
-    font-family: 'Courier New', monospace;
+.math-preview {
     display: flex;
     align-items: center;
-    cursor: text;
+    background: var(--white);
+    border: 2px solid var(--primary-pink);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-light);
     transition: var(--transition);
 }
 
-.function-display:hover {
-    border-color: var(--primary-pink);
-    box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.1);
+.math-preview:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
 }
 
-.function-preview {
+.function-label {
     color: var(--primary-pink);
     font-weight: 700;
-    margin-right: 10px;
+    font-size: 1.3rem;
+    margin-right: 15px;
+    min-width: 80px;
 }
 
-.function-content {
+.math-input {
     flex: 1;
+    font-size: 1.4rem;
+    border: none;
+    background: transparent;
+    min-height: 40px;
+}
+
+/* Expression History */
+.expression-history {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--medium-pink);
+}
+
+.history-header {
+    color: var(--primary-pink);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.history-item {
+    background: var(--white);
+    border: 1px solid var(--light-pink);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.history-item:hover {
+    background: var(--light-pink);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-light);
+}
+
+.history-item .expression {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
     color: var(--text-dark);
 }
 
-.function-content.placeholder {
-    color: var(--dark-gray);
-    font-style: italic;
+.use-btn {
+    background: none;
+    border: none;
+    color: var(--primary-pink);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: var(--transition);
 }
 
-.function-input-hidden {
-    position: absolute;
-    left: -9999px;
-    opacity: 0;
+.use-btn:hover {
+    background: var(--primary-pink);
+    color: var(--white);
 }
 
 /* Scientific Calculator */
 .scientific-calculator {
-    background: linear-gradient(135deg, var(--pale-pink), var(--medium-pink));
-    border-radius: 15px;
-    padding: 20px;
+    background: linear-gradient(135deg, var(--pale-pink), var(--white));
+    border: 2px solid var(--primary-pink);
+    border-radius: 20px;
     box-shadow: var(--shadow-medium);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.calculator-header {
+    background: linear-gradient(135deg, var(--primary-pink), var(--deep-pink));
+    color: var(--white);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calculator-header i {
+    margin-right: 10px;
+}
+
+.toggle-calculator {
+    background: none;
+    border: none;
+    color: var(--white);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.toggle-calculator:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.calculator-body {
+    padding: 20px;
+    transition: var(--transition);
+}
+
+.calculator-body.collapsed {
+    max-height: 0;
+    padding: 0 20px;
+    overflow: hidden;
 }
 
 .calc-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .calc-row:last-child {
@@ -310,111 +409,232 @@ body {
 .calc-btn {
     padding: 12px 8px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: var(--transition);
     font-family: var(--font-family);
-    min-height: 45px;
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Different button types */
-.number-btn {
-    background: var(--white);
+.calc-btn:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.calc-btn:active:before {
+    width: 100px;
+    height: 100px;
+}
+
+/* Calculator Button Types */
+.num-btn {
+    background: linear-gradient(135deg, var(--white), var(--light-gray));
     color: var(--text-dark);
     border: 2px solid var(--medium-gray);
+    font-size: 1.1rem;
 }
 
-.number-btn:hover {
-    background: var(--light-gray);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-light);
+.num-btn:hover {
+    background: linear-gradient(135deg, var(--light-gray), var(--medium-gray));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--primary-pink);
 }
 
-.operator-btn {
+.op-btn {
     background: linear-gradient(135deg, var(--primary-pink), var(--deep-pink));
     color: var(--white);
+    font-size: 1.2rem;
 }
 
-.operator-btn:hover {
+.op-btn:hover {
     background: linear-gradient(135deg, var(--deep-pink), var(--primary-pink));
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.trig-btn {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: var(--white);
+    font-size: 0.8rem;
+}
+
+.trig-btn:hover {
+    background: linear-gradient(135deg, #66bb6a, #4caf50);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
-.function-btn {
-    background: linear-gradient(135deg, #4caf50, #66bb6a);
+.log-btn {
+    background: linear-gradient(135deg, #ff9800, #ffb74d);
     color: var(--white);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
-.function-btn:hover {
-    background: linear-gradient(135deg, #66bb6a, #4caf50);
-    transform: translateY(-2px);
+.log-btn:hover {
+    background: linear-gradient(135deg, #ffb74d, #ff9800);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
 .power-btn {
-    background: linear-gradient(135deg, #ff9800, #ffb74d);
+    background: linear-gradient(135deg, #9c27b0, #ba68c8);
     color: var(--white);
+    font-size: 1rem;
 }
 
 .power-btn:hover {
-    background: linear-gradient(135deg, #ffb74d, #ff9800);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-}
-
-.constant-btn {
-    background: linear-gradient(135deg, #9c27b0, #ba68c8);
-    color: var(--white);
-}
-
-.constant-btn:hover {
     background: linear-gradient(135deg, #ba68c8, #9c27b0);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
-.variable-btn {
+.root-btn {
+    background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+    color: var(--white);
+    font-size: 1.1rem;
+}
+
+.root-btn:hover {
+    background: linear-gradient(135deg, #5c6bc0, #3f51b5);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.const-btn {
+    background: linear-gradient(135deg, #795548, #8d6e63);
+    color: var(--white);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.const-btn:hover {
+    background: linear-gradient(135deg, #8d6e63, #795548);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.exp-btn {
+    background: linear-gradient(135deg, #e91e63, #f06292);
+    color: var(--white);
+    font-size: 0.9rem;
+}
+
+.exp-btn:hover {
+    background: linear-gradient(135deg, #f06292, #e91e63);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.var-btn {
     background: linear-gradient(135deg, #2196f3, #64b5f6);
     color: var(--white);
     font-weight: 700;
     font-style: italic;
+    font-size: 1.2rem;
 }
 
-.variable-btn:hover {
+.var-btn:hover {
     background: linear-gradient(135deg, #64b5f6, #2196f3);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
-.special-btn {
-    background: var(--light-gray);
-    color: var(--text-dark);
-    border: 2px solid var(--medium-gray);
+.frac-btn {
+    background: linear-gradient(135deg, #607d8b, #78909c);
+    color: var(--white);
+    font-size: 1.1rem;
 }
 
-.special-btn:hover {
-    background: var(--medium-gray);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-light);
+.frac-btn:hover {
+    background: linear-gradient(135deg, #78909c, #607d8b);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.bracket-btn {
+    background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray));
+    color: var(--white);
+    font-size: 1.1rem;
+}
+
+.bracket-btn:hover {
+    background: linear-gradient(135deg, var(--dark-gray), var(--medium-gray));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
 }
 
 .action-btn {
     background: linear-gradient(135deg, var(--error), #f44336);
     color: var(--white);
+    font-size: 0.9rem;
 }
 
 .action-btn:hover {
     background: linear-gradient(135deg, #f44336, var(--error));
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.validate-btn {
+    background: linear-gradient(135deg, var(--success), #66bb6a);
+    color: var(--white);
+    font-size: 0.9rem;
+}
+
+.validate-btn:hover {
+    background: linear-gradient(135deg, #66bb6a, var(--success));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.example-btn {
+    background: linear-gradient(135deg, #ff5722, #ff7043);
+    color: var(--white);
+    font-size: 0.9rem;
+}
+
+.example-btn:hover {
+    background: linear-gradient(135deg, #ff7043, #ff5722);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
 }
 
 .calc-btn:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
+}
+
+/* Math Help */
+.math-help {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid var(--light-pink);
+}
+
+.validation-status {
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.validation-status.valid {
+    color: var(--success);
+}
+
+.validation-status.invalid {
+    color: var(--error);
 }
 
 /* Superscript styling for exponents */

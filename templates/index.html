@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathLive for mathematical input -->
+    <script src="https://unpkg.com/mathlive"></script>
+    <!-- Math.js for expression parsing -->
+    <script src="https://unpkg.com/mathjs@11.11.0/lib/browser/math.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -29,78 +33,166 @@
                         <i class="fas fa-function"></i>
                         Função f(x)
                     </label>
-                    <div class="function-input-container">
-                        <div class="function-display" id="functionDisplay">
-                            <span class="function-preview">f(x) = </span>
-                            <span class="function-content" id="functionContent">Digite sua função...</span>
+                    
+                    <!-- Editor Matemático Visual -->
+                    <div class="math-editor-container">
+                        <div class="math-preview">
+                            <span class="function-label">f(x) = </span>
+                            <math-field id="mathEditor" class="math-input">
+                                x^2 + 2x + 1
+                            </math-field>
                         </div>
-                        <input 
-                            type="text" 
-                            id="function" 
-                            name="function" 
-                            class="form-input function-input-hidden" 
-                            placeholder="Ex: x^3 - x - 2"
-                            required
-                        >
                         
-                        <!-- Calculadora Científica -->
-                        <div class="scientific-calculator">
-                            <!-- Linha 1: Funções especiais -->
+                        <!-- Input oculto para o formulário -->
+                        <input type="hidden" id="function" name="function" required>
+                        
+                        <!-- Histórico de Expressões -->
+                        <div class="expression-history" id="expressionHistory">
+                            <div class="history-header">
+                                <i class="fas fa-history"></i> Histórico
+                            </div>
+                            <div class="history-items" id="historyItems">
+                                <div class="history-item" data-expression="x^3 - x - 2">
+                                    <span class="expression">x³ - x - 2</span>
+                                    <button class="use-btn" title="Usar esta expressão">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </div>
+                                <div class="history-item" data-expression="sin(x) - 0.5">
+                                    <span class="expression">sin(x) - 0.5</span>
+                                    <button class="use-btn" title="Usar esta expressão">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </div>
+                                <div class="history-item" data-expression="exp(x) - 2">
+                                    <span class="expression">e^x - 2</span>
+                                    <button class="use-btn" title="Usar esta expressão">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Calculadora Científica Interativa -->
+                    <div class="scientific-calculator">
+                        <div class="calculator-header">
+                            <i class="fas fa-calculator"></i>
+                            <span>Calculadora Científica</span>
+                            <button type="button" class="toggle-calculator" id="toggleCalc">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="calculator-body" id="calculatorBody">
+                            <!-- Linha 1: Funções Trigonométricas -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn function-btn" data-func="sin(">sin</button>
-                                <button type="button" class="calc-btn function-btn" data-func="cos(">cos</button>
-                                <button type="button" class="calc-btn function-btn" data-func="tan(">tan</button>
-                                <button type="button" class="calc-btn function-btn" data-func="log(">ln</button>
-                                <button type="button" class="calc-btn function-btn" data-func="sqrt(">√</button>
+                                <button type="button" class="calc-btn trig-btn" data-latex="\sin\left(\right)" title="Seno">
+                                    <i class="fas fa-wave-square"></i> sin
+                                </button>
+                                <button type="button" class="calc-btn trig-btn" data-latex="\cos\left(\right)" title="Cosseno">
+                                    <i class="fas fa-wave-square"></i> cos
+                                </button>
+                                <button type="button" class="calc-btn trig-btn" data-latex="\tan\left(\right)" title="Tangente">
+                                    <i class="fas fa-wave-square"></i> tan
+                                </button>
+                                <button type="button" class="calc-btn log-btn" data-latex="\ln\left(\right)" title="Logaritmo Natural">
+                                    <i class="fas fa-chart-line"></i> ln
+                                </button>
+                                <button type="button" class="calc-btn log-btn" data-latex="\log\left(\right)" title="Logaritmo Base 10">
+                                    <i class="fas fa-chart-line"></i> log₁₀
+                                </button>
                             </div>
                             
-                            <!-- Linha 2: Potências e constantes -->
+                            <!-- Linha 2: Potências e Raízes -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn power-btn" data-power="2">x²</button>
-                                <button type="button" class="calc-btn power-btn" data-power="3">x³</button>
-                                <button type="button" class="calc-btn" data-symbol="^">x^</button>
-                                <button type="button" class="calc-btn constant-btn" data-const="pi">π</button>
-                                <button type="button" class="calc-btn constant-btn" data-const="e">e</button>
+                                <button type="button" class="calc-btn power-btn" data-latex="^{2}" title="Ao quadrado">
+                                    x²
+                                </button>
+                                <button type="button" class="calc-btn power-btn" data-latex="^{3}" title="Ao cubo">
+                                    x³
+                                </button>
+                                <button type="button" class="calc-btn power-btn" data-latex="^{\placeholder{}}" title="Potência">
+                                    x^n
+                                </button>
+                                <button type="button" class="calc-btn root-btn" data-latex="\sqrt{\placeholder{}}" title="Raiz quadrada">
+                                    √
+                                </button>
+                                <button type="button" class="calc-btn root-btn" data-latex="\sqrt[3]{\placeholder{}}" title="Raiz cúbica">
+                                    ∛
+                                </button>
                             </div>
                             
-                            <!-- Linha 3: Números -->
+                            <!-- Linha 3: Constantes e Exponencial -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn number-btn" data-number="7">7</button>
-                                <button type="button" class="calc-btn number-btn" data-number="8">8</button>
-                                <button type="button" class="calc-btn number-btn" data-number="9">9</button>
-                                <button type="button" class="calc-btn operator-btn" data-op="/">/</button>
-                                <button type="button" class="calc-btn variable-btn" data-var="x">x</button>
+                                <button type="button" class="calc-btn const-btn" data-latex="\pi" title="Pi">
+                                    π
+                                </button>
+                                <button type="button" class="calc-btn const-btn" data-latex="e" title="Número de Euler">
+                                    e
+                                </button>
+                                <button type="button" class="calc-btn exp-btn" data-latex="e^{\placeholder{}}" title="Exponencial">
+                                    e^x
+                                </button>
+                                <button type="button" class="calc-btn var-btn" data-latex="x" title="Variável x">
+                                    x
+                                </button>
+                                <button type="button" class="calc-btn frac-btn" data-latex="\frac{\placeholder{}}{\placeholder{}}" title="Fração">
+                                    ½
+                                </button>
                             </div>
                             
-                            <!-- Linha 4: Números -->
+                            <!-- Linha 4: Operadores -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn number-btn" data-number="4">4</button>
-                                <button type="button" class="calc-btn number-btn" data-number="5">5</button>
-                                <button type="button" class="calc-btn number-btn" data-number="6">6</button>
-                                <button type="button" class="calc-btn operator-btn" data-op="*">×</button>
-                                <button type="button" class="calc-btn special-btn" data-symbol="(">(</button>
+                                <button type="button" class="calc-btn op-btn" data-latex="+" title="Adição">+</button>
+                                <button type="button" class="calc-btn op-btn" data-latex="-" title="Subtração">−</button>
+                                <button type="button" class="calc-btn op-btn" data-latex="\cdot" title="Multiplicação">×</button>
+                                <button type="button" class="calc-btn op-btn" data-latex="\div" title="Divisão">÷</button>
+                                <button type="button" class="calc-btn bracket-btn" data-latex="\left(\right)" title="Parênteses">( )</button>
                             </div>
                             
                             <!-- Linha 5: Números -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn number-btn" data-number="1">1</button>
-                                <button type="button" class="calc-btn number-btn" data-number="2">2</button>
-                                <button type="button" class="calc-btn number-btn" data-number="3">3</button>
-                                <button type="button" class="calc-btn operator-btn" data-op="-">-</button>
-                                <button type="button" class="calc-btn special-btn" data-symbol=")">)</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="7">7</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="8">8</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="9">9</button>
+                                <button type="button" class="calc-btn action-btn" id="clearBtn" title="Limpar tudo">
+                                    <i class="fas fa-trash"></i> C
+                                </button>
+                                <button type="button" class="calc-btn action-btn" id="backspaceBtn" title="Apagar">
+                                    <i class="fas fa-backspace"></i>
+                                </button>
                             </div>
                             
-                            <!-- Linha 6: Zero e operadores -->
                             <div class="calc-row">
-                                <button type="button" class="calc-btn number-btn" data-number="0">0</button>
-                                <button type="button" class="calc-btn special-btn" data-symbol=".">.</button>
-                                <button type="button" class="calc-btn action-btn" id="clearBtn">C</button>
-                                <button type="button" class="calc-btn operator-btn" data-op="+">+</button>
-                                <button type="button" class="calc-btn action-btn" id="backspaceBtn">⌫</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="4">4</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="5">5</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="6">6</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="1">1</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="2">2</button>
+                            </div>
+                            
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn num-btn" data-latex="3">3</button>
+                                <button type="button" class="calc-btn num-btn" data-latex="0">0</button>
+                                <button type="button" class="calc-btn num-btn" data-latex=".">.</button>
+                                <button type="button" class="calc-btn validate-btn" id="validateBtn" title="Validar expressão">
+                                    <i class="fas fa-check"></i> OK
+                                </button>
+                                <button type="button" class="calc-btn example-btn" id="exampleBtn" title="Inserir exemplo">
+                                    <i class="fas fa-lightbulb"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <small class="form-hint">Use a calculadora científica abaixo ou digite diretamente. Potências serão mostradas como expoentes.</small>
+                    
+                    <div class="math-help">
+                        <small class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Use a calculadora acima ou digite diretamente no editor. A expressão será formatada automaticamente.
+                            <span class="validation-status" id="validationStatus"></span>
+                        </small>
+                    </div>
                 </div>
 
                 <div class="form-section">
@@ -268,6 +360,7 @@
         </footer>
     </div>
 
+    <script src="{{ url_for('static', filename='js/math-calculator.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
