@@ -282,6 +282,22 @@ body {
     min-height: 40px;
 }
 
+.math-input.fallback-input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--light-pink);
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-family: 'Courier New', monospace;
+    color: var(--text-dark);
+    outline: none;
+    transition: var(--transition);
+}
+
+.math-input.fallback-input:focus {
+    border-color: var(--primary-pink);
+    box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.1);
+}
+
 /* Expression History */
 .expression-history {
     background: rgba(255, 255, 255, 0.8);

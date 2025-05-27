@@ -36,19 +36,10 @@ function setupEventListeners() {
         input.addEventListener('input', validateInput);
     });
 
-    // Calculator buttons
-    setupCalculatorButtons();
-
-    // Function display click to focus
-    functionDisplay.addEventListener('click', function() {
-        functionContent.focus();
-    });
+    // No longer needed - using MathLive calculator
 }
 
-function initializeCalculator() {
-    currentFunction = '';
-    updateFunctionDisplay();
-}
+
 
 // Function to get current function value from the math calculator
 function getCurrentFunction() {

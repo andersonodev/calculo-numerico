@@ -18,34 +18,87 @@ class MathCalculator {
 
     setupMathField() {
         const mathEditor = document.getElementById('mathEditor');
+        if (!mathEditor) {
+            console.log('MathEditor not found, creating fallback');
+            return;
+        }
+
+        // Wait for MathLive to be available
+        if (typeof MathfieldElement === 'undefined') {
+            console.log('MathLive not loaded, using fallback input');
+            this.setupFallbackInput();
+            return;
+        }
+
+        try {
+            // Configure MathLive
+            this.mathField = mathEditor;
+            
+            // Set initial value
+            this.mathField.value = 'x^2 + 2x + 1';
+            
+            // Configure MathLive options (modern syntax)
+            this.mathField.mathVirtualKeyboardPolicy = 'off';
+            this.mathField.smartFence = true;
+            this.mathField.smartSuperscript = true;
+            MathfieldElement.locale = 'pt-BR';
+
+            // Listen for input changes
+            this.mathField.addEventListener('input', (ev) => {
+                this.onMathFieldChange();
+            });
+
+            // Update hidden input initially
+            this.onMathFieldChange();
+            
+            console.log('MathLive initialized successfully');
+        } catch (error) {
+            console.log('MathLive failed, using fallback:', error);
+            this.setupFallbackInput();
+        }
+    }
+
+    setupFallbackInput() {
+        const mathEditor = document.getElementById('mathEditor');
         if (!mathEditor) return;
 
-        // Configure MathLive
-        this.mathField = new MathfieldElement();
-        this.mathField.id = 'mathEditor';
-        this.mathField.className = 'math-input';
+        // Create a regular input as fallback
+        const fallbackInput = document.createElement('input');
+        fallbackInput.type = 'text';
+        fallbackInput.id = 'mathEditor';
+        fallbackInput.className = 'math-input fallback-input';
+        fallbackInput.placeholder = 'Digite sua função: ex: x^2 + 2*x + 1';
+        fallbackInput.value = 'x^2 + 2*x + 1';
         
-        // Set initial value
-        this.mathField.value = 'x^2 + 2x + 1';
+        // Replace the math-field with regular input
+        mathEditor.parentNode.replaceChild(fallbackInput, mathEditor);
+        this.mathField = fallbackInput;
         
-        // Replace the existing element
-        mathEditor.parentNode.replaceChild(this.mathField, mathEditor);
-
-        // Configure MathLive options
-        this.mathField.setOptions({
-            virtualKeyboardMode: 'off',
-            smartFence: true,
-            smartSuperscript: true,
-            locale: 'pt-BR'
+        // Add event listener for changes
+        this.mathField.addEventListener('input', () => {
+            this.onFallbackChange();
         });
+        
+        // Initial update
+        this.onFallbackChange();
+    }
 
-        // Listen for input changes
-        this.mathField.addEventListener('input', (ev) => {
-            this.onMathFieldChange();
-        });
-
-        // Update hidden input initially
-        this.onMathFieldChange();
+    onFallbackChange() {
+        if (!this.mathField) return;
+        
+        const expression = this.mathField.value;
+        const hiddenInput = document.getElementById('function');
+        if (hiddenInput) {
+            hiddenInput.value = expression;
+        }
+        
+        // Store current function for graphs
+        if (window.currentFunction !== undefined) {
+            window.currentFunction = expression;
+        }
+        
+        // Real-time validation
+        this.validateExpressionReal();
     }
 
     setupCalculatorButtons() {
