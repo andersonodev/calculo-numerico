@@ -75,8 +75,8 @@ def false_position(function_str: str, a: float, b: float, tolerance: float, max_
                 'relative_error': round(relative_error, 8) if relative_error != float('inf') else 'N/A'
             })
             
-            # Check convergence
-            if i > 0 and relative_error <= tolerance:
+            # Check convergence - using relative error as percentage
+            if i > 0 and relative_error <= tolerance / 100.0:
                 break
             
             # Update interval based on sign of f(a) * f(xr)
@@ -166,8 +166,8 @@ def newton_raphson(function_str: str, x0: float, tolerance: float, max_iteration
                 'relative_error_percent': round(relative_error_percent, 8) if relative_error_percent != float('inf') else 'N/A'
             })
             
-            # Check convergence: relative error <= tolerance
-            if relative_error <= tolerance:
+            # Check convergence: relative error <= tolerance (convert tolerance to decimal)
+            if relative_error <= tolerance / 100.0:
                 converged = True
                 break
             

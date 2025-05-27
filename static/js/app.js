@@ -448,27 +448,33 @@ function createFunctionChart(result) {
                     label: 'f(x)',
                     data: functionData.points,
                     borderColor: 'rgb(236, 64, 122)',
-                    backgroundColor: 'rgba(236, 64, 122, 0.1)',
-                    borderWidth: 3,
-                    fill: false,
-                    tension: 0.1
+                    backgroundColor: 'rgba(236, 64, 122, 0.05)',
+                    borderWidth: 4,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
                 },
                 {
-                    label: 'y = 0',
+                    label: 'Eixo y = 0',
                     data: functionData.zeroLine,
-                    borderColor: 'rgba(100, 100, 100, 0.5)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
+                    borderColor: 'rgba(100, 100, 100, 0.8)',
+                    backgroundColor: 'rgba(100, 100, 100, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [8, 4],
+                    fill: false,
+                    pointRadius: 0
                 },
                 {
-                    label: 'Raiz encontrada',
+                    label: '🎯 Raiz Encontrada',
                     data: [{ x: result.root, y: 0 }],
-                    backgroundColor: 'rgb(76, 175, 80)',
-                    borderColor: 'rgb(76, 175, 80)',
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                    showLine: false
+                    backgroundColor: 'rgb(255, 193, 7)',
+                    borderColor: 'rgb(255, 152, 0)',
+                    borderWidth: 4,
+                    pointRadius: 12,
+                    pointHoverRadius: 15,
+                    showLine: false,
+                    pointStyle: 'star'
                 },
                 ...generateIterationPoints(result)
             ]
@@ -479,13 +485,37 @@ function createFunctionChart(result) {
             plugins: {
                 title: {
                     display: true,
-                    text: `Gráfico de ${currentFunction}`,
-                    font: { size: 16, weight: 'bold' },
-                    color: 'rgb(236, 64, 122)'
+                    text: `📊 Gráfico da Função: ${currentFunction}`,
+                    font: { size: 18, weight: 'bold', family: 'Poppins' },
+                    color: 'rgb(236, 64, 122)',
+                    padding: 20
                 },
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 12, weight: '600' },
+                        color: 'rgb(85, 85, 85)'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: 'rgb(236, 64, 122)',
+                    bodyColor: 'rgb(85, 85, 85)',
+                    borderColor: 'rgb(236, 64, 122)',
+                    borderWidth: 2,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        title: function(context) {
+                            return `x = ${context[0].parsed.x.toFixed(6)}`;
+                        },
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y.toFixed(6)}`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -493,25 +523,43 @@ function createFunctionChart(result) {
                     type: 'linear',
                     title: {
                         display: true,
-                        text: 'x'
+                        text: 'x',
+                        font: { size: 14, weight: 'bold' },
+                        color: 'rgb(236, 64, 122)'
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(236, 64, 122, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'rgb(85, 85, 85)',
+                        font: { weight: '600' }
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'f(x)'
+                        text: 'f(x)',
+                        font: { size: 14, weight: 'bold' },
+                        color: 'rgb(236, 64, 122)'
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(236, 64, 122, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'rgb(85, 85, 85)',
+                        font: { weight: '600' }
                     }
                 }
             },
             interaction: {
                 intersect: false,
                 mode: 'index'
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeInOutQuart'
             }
         }
     });
@@ -533,30 +581,44 @@ function createConvergenceChart(result) {
         data: {
             datasets: [
                 {
-                    label: 'Valor de x',
+                    label: '📈 Aproximação de x',
                     data: convergenceData.xValues,
                     borderColor: 'rgb(33, 150, 243)',
                     backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                    borderWidth: 3,
-                    fill: false,
+                    borderWidth: 4,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgb(33, 150, 243)',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
                     yAxisID: 'y'
                 },
                 {
-                    label: 'Erro Relativo (%)',
+                    label: '📉 Erro Relativo (%)',
                     data: convergenceData.errors,
                     borderColor: 'rgb(255, 152, 0)',
                     backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                    borderWidth: 2,
-                    fill: false,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgb(255, 152, 0)',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
                     yAxisID: 'y1'
                 },
                 {
-                    label: 'Raiz verdadeira',
+                    label: '🎯 Raiz Exata',
                     data: convergenceData.trueLine,
-                    borderColor: 'rgba(76, 175, 80, 0.8)',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
+                    borderColor: 'rgba(76, 175, 80, 0.9)',
+                    backgroundColor: 'rgba(76, 175, 80, 0.05)',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
                     fill: false,
+                    pointRadius: 0,
                     yAxisID: 'y'
                 }
             ]
@@ -567,23 +629,58 @@ function createConvergenceChart(result) {
             plugins: {
                 title: {
                     display: true,
-                    text: `Convergência - ${result.method}`,
-                    font: { size: 16, weight: 'bold' },
-                    color: 'rgb(236, 64, 122)'
+                    text: `📊 Análise de Convergência - ${result.method}`,
+                    font: { size: 18, weight: 'bold', family: 'Poppins' },
+                    color: 'rgb(236, 64, 122)',
+                    padding: 20
                 },
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 12, weight: '600' },
+                        color: 'rgb(85, 85, 85)'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: 'rgb(236, 64, 122)',
+                    bodyColor: 'rgb(85, 85, 85)',
+                    borderColor: 'rgb(236, 64, 122)',
+                    borderWidth: 2,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        title: function(context) {
+                            return `Iteração ${context[0].label}`;
+                        },
+                        label: function(context) {
+                            if (context.dataset.label.includes('Erro')) {
+                                return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}%`;
+                            } else {
+                                return `${context.dataset.label}: ${context.parsed.y.toFixed(8)}`;
+                            }
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
                     title: {
                         display: true,
-                        text: 'Iteração'
+                        text: 'Número da Iteração',
+                        font: { size: 14, weight: 'bold' },
+                        color: 'rgb(236, 64, 122)'
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(236, 64, 122, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'rgb(85, 85, 85)',
+                        font: { weight: '600' }
                     }
                 },
                 y: {
@@ -592,28 +689,51 @@ function createConvergenceChart(result) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Valor de x'
+                        text: 'Valor de x',
+                        font: { size: 14, weight: 'bold' },
+                        color: 'rgb(33, 150, 243)'
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(33, 150, 243, 0.1)',
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        color: 'rgb(33, 150, 243)',
+                        font: { weight: '600' }
                     }
                 },
                 y1: {
-                    type: 'linear',
+                    type: 'logarithmic',
                     display: true,
                     position: 'right',
                     title: {
                         display: true,
-                        text: 'Erro Relativo (%)'
+                        text: 'Erro Relativo (% - escala log)',
+                        font: { size: 14, weight: 'bold' },
+                        color: 'rgb(255, 152, 0)'
                     },
                     grid: {
                         drawOnChartArea: false
+                    },
+                    ticks: {
+                        color: 'rgb(255, 152, 0)',
+                        font: { weight: '600' },
+                        callback: function(value) {
+                            if (value === 0.01 || value === 0.1 || value === 1 || value === 10 || value === 100) {
+                                return value + '%';
+                            }
+                            return '';
+                        }
                     }
                 }
             },
             interaction: {
                 intersect: false,
                 mode: 'index'
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeInOutQuart'
             }
         }
     });
