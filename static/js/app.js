@@ -8,11 +8,18 @@ const newtonInfo = document.getElementById('newton-info');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
 const error = document.getElementById('error');
+const functionDisplay = document.getElementById('functionDisplay');
+const functionContent = document.getElementById('functionContent');
+const hiddenInput = document.getElementById('function');
+
+// Function expression storage
+let currentFunction = '';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     updateMethodDisplay();
+    initializeCalculator();
 });
 
 function setupEventListeners() {
@@ -30,17 +37,131 @@ function setupEventListeners() {
         input.addEventListener('input', validateInput);
     });
 
-    // Function input validation
-    const functionInput = document.getElementById('function');
-    functionInput.addEventListener('blur', validateFunction);
+    // Calculator buttons
+    setupCalculatorButtons();
 
-    // Math buttons functionality
-    const mathButtons = document.querySelectorAll('.math-btn');
-    mathButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            insertMathSymbol(this.getAttribute('data-symbol'));
+    // Function display click to focus
+    functionDisplay.addEventListener('click', function() {
+        functionContent.focus();
+    });
+}
+
+function initializeCalculator() {
+    currentFunction = '';
+    updateFunctionDisplay();
+}
+
+function setupCalculatorButtons() {
+    // Number buttons
+    document.querySelectorAll('.number-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insertToFunction(this.getAttribute('data-number'));
         });
     });
+
+    // Operator buttons  
+    document.querySelectorAll('.operator-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const op = this.getAttribute('data-op');
+            insertToFunction(op === '×' ? '*' : op);
+        });
+    });
+
+    // Function buttons
+    document.querySelectorAll('.function-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insertToFunction(this.getAttribute('data-func'));
+        });
+    });
+
+    // Power buttons
+    document.querySelectorAll('.power-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const power = this.getAttribute('data-power');
+            insertToFunction('^' + power);
+        });
+    });
+
+    // Constant buttons
+    document.querySelectorAll('.constant-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insertToFunction(this.getAttribute('data-const'));
+        });
+    });
+
+    // Variable button
+    document.querySelectorAll('.variable-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insertToFunction(this.getAttribute('data-var'));
+        });
+    });
+
+    // Special buttons
+    document.querySelectorAll('.special-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insertToFunction(this.getAttribute('data-symbol'));
+        });
+    });
+
+    // Action buttons
+    document.getElementById('clearBtn').addEventListener('click', clearFunction);
+    document.getElementById('backspaceBtn').addEventListener('click', backspaceFunction);
+
+    // Generic symbol buttons
+    document.querySelectorAll('[data-symbol]').forEach(btn => {
+        if (!btn.classList.contains('special-btn')) {
+            btn.addEventListener('click', function() {
+                insertToFunction(this.getAttribute('data-symbol'));
+            });
+        }
+    });
+}
+
+function insertToFunction(value) {
+    currentFunction += value;
+    updateFunctionDisplay();
+    clearInputError(hiddenInput);
+}
+
+function clearFunction() {
+    currentFunction = '';
+    updateFunctionDisplay();
+}
+
+function backspaceFunction() {
+    currentFunction = currentFunction.slice(0, -1);
+    updateFunctionDisplay();
+}
+
+function updateFunctionDisplay() {
+    if (currentFunction === '') {
+        functionContent.innerHTML = '<span class="placeholder">Digite sua função...</span>';
+        hiddenInput.value = '';
+    } else {
+        // Convert function to display format with superscripts
+        const displayFunction = formatFunctionForDisplay(currentFunction);
+        functionContent.innerHTML = displayFunction;
+        hiddenInput.value = currentFunction;
+    }
+}
+
+function formatFunctionForDisplay(func) {
+    // Convert ^ notation to superscript for display
+    let formatted = func;
+    
+    // Handle powers with parentheses like ^(2+x)
+    formatted = formatted.replace(/\^(\([^)]+\))/g, '<span class="superscript">$1</span>');
+    
+    // Handle simple powers like ^2, ^3, ^x, etc.
+    formatted = formatted.replace(/\^([a-zA-Z0-9]+)/g, '<span class="superscript">$1</span>');
+    
+    // Replace common functions with better display
+    formatted = formatted.replace(/sqrt\(/g, '√(');
+    formatted = formatted.replace(/log\(/g, 'ln(');
+    formatted = formatted.replace(/\bpi\b/g, 'π');
+    formatted = formatted.replace(/\be\b(?![a-zA-Z])/g, 'e');
+    
+    return formatted;
 }
 
 function updateMethodDisplay() {
@@ -64,25 +185,7 @@ function updateMethodDisplay() {
     hideError();
 }
 
-function insertMathSymbol(symbol) {
-    const functionInput = document.getElementById('function');
-    const cursorPos = functionInput.selectionStart;
-    const currentValue = functionInput.value;
-    
-    // Insert symbol at cursor position
-    const newValue = currentValue.substring(0, cursorPos) + symbol + currentValue.substring(cursorPos);
-    functionInput.value = newValue;
-    
-    // Move cursor to end of inserted symbol
-    const newCursorPos = cursorPos + symbol.length;
-    functionInput.setSelectionRange(newCursorPos, newCursorPos);
-    
-    // Focus back to input
-    functionInput.focus();
-    
-    // Clear any existing errors
-    clearInputError(functionInput);
-}
+
 
 function validateInput(event) {
     const input = event.target;
@@ -102,23 +205,15 @@ function validateInput(event) {
     return true;
 }
 
-function validateFunction(event) {
-    const input = event.target;
-    const value = input.value.trim();
+function validateFunction() {
+    const value = currentFunction.trim();
     
     if (!value) {
-        showInputError(input, 'Por favor, insira uma função');
+        showInputError(hiddenInput, 'Por favor, insira uma função');
         return false;
     }
     
-    // Basic validation for mathematical expressions
-    const invalidChars = /[^x\d\+\-\*\/\^\(\)\.\s\w]/g;
-    if (invalidChars.test(value)) {
-        showInputError(input, 'Use apenas caracteres matemáticos válidos');
-        return false;
-    }
-    
-    clearInputError(input);
+    clearInputError(hiddenInput);
     return true;
 }
 
@@ -204,7 +299,6 @@ async function handleFormSubmit(event) {
 }
 
 function validateForm() {
-    const functionInput = document.getElementById('function');
     const toleranceInput = document.getElementById('tolerance');
     const maxIterationsInput = document.getElementById('max_iterations');
     const selectedMethod = document.querySelector('input[name="method"]:checked').value;
@@ -212,7 +306,7 @@ function validateForm() {
     let isValid = true;
     
     // Validate function
-    if (!validateFunction({ target: functionInput })) {
+    if (!validateFunction()) {
         isValid = false;
     }
     

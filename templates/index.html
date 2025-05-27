@@ -29,30 +29,77 @@
                         Função f(x)
                     </label>
                     <div class="function-input-container">
+                        <div class="function-display" id="functionDisplay">
+                            <span class="function-preview">f(x) = </span>
+                            <span class="function-content" id="functionContent">Digite sua função...</span>
+                        </div>
                         <input 
                             type="text" 
                             id="function" 
                             name="function" 
-                            class="form-input function-input" 
+                            class="form-input function-input-hidden" 
                             placeholder="Ex: x^3 - x - 2"
                             required
                         >
-                        <div class="math-buttons">
-                            <button type="button" class="math-btn" data-symbol="^2">x²</button>
-                            <button type="button" class="math-btn" data-symbol="^3">x³</button>
-                            <button type="button" class="math-btn" data-symbol="^">x^</button>
-                            <button type="button" class="math-btn" data-symbol="sqrt(">√</button>
-                            <button type="button" class="math-btn" data-symbol="sin(">sin</button>
-                            <button type="button" class="math-btn" data-symbol="cos(">cos</button>
-                            <button type="button" class="math-btn" data-symbol="exp(">e^</button>
-                            <button type="button" class="math-btn" data-symbol="log(">ln</button>
-                            <button type="button" class="math-btn" data-symbol="pi">π</button>
-                            <button type="button" class="math-btn" data-symbol="e">e</button>
-                            <button type="button" class="math-btn" data-symbol="(">(</button>
-                            <button type="button" class="math-btn" data-symbol=")">)</button>
+                        
+                        <!-- Calculadora Científica -->
+                        <div class="scientific-calculator">
+                            <!-- Linha 1: Funções especiais -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn function-btn" data-func="sin(">sin</button>
+                                <button type="button" class="calc-btn function-btn" data-func="cos(">cos</button>
+                                <button type="button" class="calc-btn function-btn" data-func="tan(">tan</button>
+                                <button type="button" class="calc-btn function-btn" data-func="log(">ln</button>
+                                <button type="button" class="calc-btn function-btn" data-func="sqrt(">√</button>
+                            </div>
+                            
+                            <!-- Linha 2: Potências e constantes -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn power-btn" data-power="2">x²</button>
+                                <button type="button" class="calc-btn power-btn" data-power="3">x³</button>
+                                <button type="button" class="calc-btn" data-symbol="^">x^</button>
+                                <button type="button" class="calc-btn constant-btn" data-const="pi">π</button>
+                                <button type="button" class="calc-btn constant-btn" data-const="e">e</button>
+                            </div>
+                            
+                            <!-- Linha 3: Números -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn number-btn" data-number="7">7</button>
+                                <button type="button" class="calc-btn number-btn" data-number="8">8</button>
+                                <button type="button" class="calc-btn number-btn" data-number="9">9</button>
+                                <button type="button" class="calc-btn operator-btn" data-op="/">/</button>
+                                <button type="button" class="calc-btn variable-btn" data-var="x">x</button>
+                            </div>
+                            
+                            <!-- Linha 4: Números -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn number-btn" data-number="4">4</button>
+                                <button type="button" class="calc-btn number-btn" data-number="5">5</button>
+                                <button type="button" class="calc-btn number-btn" data-number="6">6</button>
+                                <button type="button" class="calc-btn operator-btn" data-op="*">×</button>
+                                <button type="button" class="calc-btn special-btn" data-symbol="(">(</button>
+                            </div>
+                            
+                            <!-- Linha 5: Números -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn number-btn" data-number="1">1</button>
+                                <button type="button" class="calc-btn number-btn" data-number="2">2</button>
+                                <button type="button" class="calc-btn number-btn" data-number="3">3</button>
+                                <button type="button" class="calc-btn operator-btn" data-op="-">-</button>
+                                <button type="button" class="calc-btn special-btn" data-symbol=")">)</button>
+                            </div>
+                            
+                            <!-- Linha 6: Zero e operadores -->
+                            <div class="calc-row">
+                                <button type="button" class="calc-btn number-btn" data-number="0">0</button>
+                                <button type="button" class="calc-btn special-btn" data-symbol=".">.</button>
+                                <button type="button" class="calc-btn action-btn" id="clearBtn">C</button>
+                                <button type="button" class="calc-btn operator-btn" data-op="+">+</button>
+                                <button type="button" class="calc-btn action-btn" id="backspaceBtn">⌫</button>
+                            </div>
                         </div>
                     </div>
-                    <small class="form-hint">Use ^ para potência (será convertido para **), clique nos botões para inserir símbolos</small>
+                    <small class="form-hint">Use a calculadora científica abaixo ou digite diretamente. Potências serão mostradas como expoentes.</small>
                 </div>
 
                 <div class="form-section">
