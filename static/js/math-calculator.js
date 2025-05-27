@@ -368,14 +368,57 @@ class MathCalculator {
         }
 
         try {
-            // Try to parse with Math.js
-            const node = math.parse(expression);
-            statusElement.textContent = '✓ Válida';
-            statusElement.className = 'validation-status valid';
+            // Simple validation - check for basic mathematical syntax
+            if (typeof math !== 'undefined' && math.parse) {
+                const node = math.parse(expression);
+                statusElement.textContent = '✓ Válida';
+                statusElement.className = 'validation-status valid';
+            } else {
+                // Fallback validation
+                this.simpleValidation(expression, statusElement);
+            }
         } catch (error) {
             statusElement.textContent = '✗ Inválida';
             statusElement.className = 'validation-status invalid';
         }
+    }
+
+    simpleValidation(expression, statusElement) {
+        // Basic validation without math.js
+        if (!expression || expression.trim() === '') {
+            statusElement.textContent = '';
+            statusElement.className = 'validation-status';
+            return;
+        }
+
+        // Check for basic patterns
+        const invalidChars = /[^x\d\+\-\*\/\^\(\)\.\s\w]/;
+        const hasVariable = /\bx\b/.test(expression);
+        const balancedParens = this.checkBalancedParentheses(expression);
+
+        if (invalidChars.test(expression.replace(/sin|cos|tan|log|sqrt|pi|exp/g, ''))) {
+            statusElement.textContent = '✗ Caracteres inválidos';
+            statusElement.className = 'validation-status invalid';
+        } else if (!hasVariable) {
+            statusElement.textContent = '⚠ Adicione variável x';
+            statusElement.className = 'validation-status invalid';
+        } else if (!balancedParens) {
+            statusElement.textContent = '✗ Parênteses desbalanceados';
+            statusElement.className = 'validation-status invalid';
+        } else {
+            statusElement.textContent = '✓ Válida';
+            statusElement.className = 'validation-status valid';
+        }
+    }
+
+    checkBalancedParentheses(expression) {
+        let count = 0;
+        for (let char of expression) {
+            if (char === '(') count++;
+            if (char === ')') count--;
+            if (count < 0) return false;
+        }
+        return count === 0;
     }
 
     validateExpression() {

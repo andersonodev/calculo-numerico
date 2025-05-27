@@ -125,6 +125,15 @@ function clearInputError(input) {
 async function handleFormSubmit(event) {
     event.preventDefault();
     
+    // Get function value from hidden input (updated by math calculator)
+    const functionInput = document.getElementById('function');
+    const functionValue = functionInput ? functionInput.value : '';
+    
+    if (!functionValue || functionValue.trim() === '') {
+        showError('Por favor, insira uma função matemática válida');
+        return;
+    }
+    
     // Validate all inputs
     const isValid = validateForm();
     if (!isValid) {
@@ -134,7 +143,7 @@ async function handleFormSubmit(event) {
     // Prepare data
     const formData = new FormData(form);
     const data = {
-        function: formData.get('function'),
+        function: functionValue, // Use the function from math editor
         method: formData.get('method'),
         tolerance: parseFloat(formData.get('tolerance')),
         max_iterations: parseInt(formData.get('max_iterations'))
