@@ -9,9 +9,16 @@ def parse_function(function_str: str):
         # Define the variable
         x = sp.Symbol('x')
         
-        # Replace common mathematical functions for compatibility
-        function_str = function_str.replace('^', '**')
-        function_str = function_str.replace('ln', 'log')
+        # Replace common mathematical functions and symbols for compatibility
+        function_str = function_str.replace('^', '**')  # Convert ^ to ** for power
+        function_str = function_str.replace('ln', 'log')  # Natural logarithm
+        function_str = function_str.replace('pi', 'PI')  # Pi constant
+        function_str = function_str.replace('e', 'E')  # Euler's number (be careful with variables)
+        
+        # Handle special cases for e as Euler's number vs variable e
+        # Only replace standalone 'e' not part of other words like 'exp'
+        import re
+        function_str = re.sub(r'\be\b', 'E', function_str)
         
         # Parse the expression
         expr = sp.sympify(function_str)
@@ -21,7 +28,7 @@ def parse_function(function_str: str):
         
         return expr, f, x
     except Exception as e:
-        raise ValueError(f"Erro ao interpretar a função: {str(e)}")
+        raise ValueError(f"Erro ao interpretar a função: {str(e)}. Verifique a sintaxe matemática.")
 
 def false_position(function_str: str, a: float, b: float, tolerance: float, max_iterations: int) -> Dict[str, Any]:
     """

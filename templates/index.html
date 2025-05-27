@@ -28,15 +28,31 @@
                         <i class="fas fa-function"></i>
                         Função f(x)
                     </label>
-                    <input 
-                        type="text" 
-                        id="function" 
-                        name="function" 
-                        class="form-input" 
-                        placeholder="Ex: x**3 - x - 2"
-                        required
-                    >
-                    <small class="form-hint">Use ** para potência, ex: x**2 + 3*x - 1</small>
+                    <div class="function-input-container">
+                        <input 
+                            type="text" 
+                            id="function" 
+                            name="function" 
+                            class="form-input function-input" 
+                            placeholder="Ex: x^3 - x - 2"
+                            required
+                        >
+                        <div class="math-buttons">
+                            <button type="button" class="math-btn" data-symbol="^2">x²</button>
+                            <button type="button" class="math-btn" data-symbol="^3">x³</button>
+                            <button type="button" class="math-btn" data-symbol="^">x^</button>
+                            <button type="button" class="math-btn" data-symbol="sqrt(">√</button>
+                            <button type="button" class="math-btn" data-symbol="sin(">sin</button>
+                            <button type="button" class="math-btn" data-symbol="cos(">cos</button>
+                            <button type="button" class="math-btn" data-symbol="exp(">e^</button>
+                            <button type="button" class="math-btn" data-symbol="log(">ln</button>
+                            <button type="button" class="math-btn" data-symbol="pi">π</button>
+                            <button type="button" class="math-btn" data-symbol="e">e</button>
+                            <button type="button" class="math-btn" data-symbol="(">(</button>
+                            <button type="button" class="math-btn" data-symbol=")">)</button>
+                        </div>
+                    </div>
+                    <small class="form-hint">Use ^ para potência (será convertido para **), clique nos botões para inserir símbolos</small>
                 </div>
 
                 <div class="form-section">

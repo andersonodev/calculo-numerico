@@ -239,6 +239,46 @@ body {
     color: var(--text-dark);
 }
 
+/* Function Input Container */
+.function-input-container {
+    position: relative;
+}
+
+.function-input {
+    margin-bottom: 15px;
+}
+
+.math-buttons {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.math-btn {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, var(--pale-pink), var(--medium-pink));
+    border: 2px solid var(--primary-pink);
+    border-radius: 8px;
+    color: var(--primary-pink);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.math-btn:hover {
+    background: linear-gradient(135deg, var(--primary-pink), var(--deep-pink));
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+}
+
+.math-btn:active {
+    transform: translateY(0);
+}
+
 /* Parameters Grid */
 .parameters-grid {
     display: grid;
@@ -250,7 +290,6 @@ body {
 .params-group {
     display: none;
     grid-column: 1 / -1;
-    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
@@ -561,6 +600,10 @@ body {
         padding: 25px;
     }
     
+    .math-buttons {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
     .parameters-grid {
         grid-template-columns: 1fr;
     }
@@ -603,6 +646,15 @@ body {
     
     .calculator-form {
         padding: 20px;
+    }
+    
+    .math-buttons {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .math-btn {
+        padding: 6px 8px;
+        font-size: 0.8rem;
     }
     
     .form-input {

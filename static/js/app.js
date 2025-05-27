@@ -33,6 +33,14 @@ function setupEventListeners() {
     // Function input validation
     const functionInput = document.getElementById('function');
     functionInput.addEventListener('blur', validateFunction);
+
+    // Math buttons functionality
+    const mathButtons = document.querySelectorAll('.math-btn');
+    mathButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            insertMathSymbol(this.getAttribute('data-symbol'));
+        });
+    });
 }
 
 function updateMethodDisplay() {
@@ -54,6 +62,26 @@ function updateMethodDisplay() {
     // Clear previous results and errors
     hideResults();
     hideError();
+}
+
+function insertMathSymbol(symbol) {
+    const functionInput = document.getElementById('function');
+    const cursorPos = functionInput.selectionStart;
+    const currentValue = functionInput.value;
+    
+    // Insert symbol at cursor position
+    const newValue = currentValue.substring(0, cursorPos) + symbol + currentValue.substring(cursorPos);
+    functionInput.value = newValue;
+    
+    // Move cursor to end of inserted symbol
+    const newCursorPos = cursorPos + symbol.length;
+    functionInput.setSelectionRange(newCursorPos, newCursorPos);
+    
+    // Focus back to input
+    functionInput.focus();
+    
+    // Clear any existing errors
+    clearInputError(functionInput);
 }
 
 function validateInput(event) {
