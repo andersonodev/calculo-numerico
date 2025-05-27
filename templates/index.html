@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💖 Calculadora Numérica Feminina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-heart"></i>
+                Calculadora de Raízes Numéricas
+                <i class="fas fa-brain"></i>
+            </h1>
+            <p class="subtitle">Métodos de Falsa Posição e Newton-Raphson com estilo feminino</p>
+        </header>
+
+        <main class="main-content">
+            <form id="calculatorForm" class="calculator-form">
+                <div class="form-section">
+                    <label for="function" class="form-label">
+                        <i class="fas fa-function"></i>
+                        Função f(x)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="function" 
+                        name="function" 
+                        class="form-input" 
+                        placeholder="Ex: x**3 - x - 2"
+                        required
+                    >
+                    <small class="form-hint">Use ** para potência, ex: x**2 + 3*x - 1</small>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-cogs"></i>
+                        Método Numérico
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="method" value="falsa_posicao" checked>
+                            <span class="radio-custom"></span>
+                            <span class="radio-text">
+                                <strong>Falsa Posição</strong>
+                                <small>Precisa de intervalo [a, b]</small>
+                            </span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="method" value="newton">
+                            <span class="radio-custom"></span>
+                            <span class="radio-text">
+                                <strong>Newton-Raphson</strong>
+                                <small>Precisa de ponto inicial x₀</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="method-info">
+                    <div id="false-position-info" class="info-box active">
+                        <h3><i class="fas fa-info-circle"></i> Falsa Posição (Regula Falsi)</h3>
+                        <p>Fórmula: x<sub>r</sub> = b - f(b)(a-b)/(f(a)-f(b))</p>
+                        <p>Garante convergência se f(a) e f(b) têm sinais opostos.</p>
+                    </div>
+                    <div id="newton-info" class="info-box">
+                        <h3><i class="fas fa-info-circle"></i> Newton-Raphson</h3>
+                        <p>Fórmula: x<sub>n+1</sub> = x<sub>n</sub> - f(x<sub>n</sub>)/f'(x<sub>n</sub>)</p>
+                        <p>Convergência rápida, mas precisa de boa estimativa inicial.</p>
+                    </div>
+                </div>
+
+                <div class="parameters-grid">
+                    <div id="false-position-params" class="params-group active">
+                        <div class="form-section">
+                            <label for="a" class="form-label">
+                                <i class="fas fa-arrow-left"></i>
+                                Limite inferior (a)
+                            </label>
+                            <input type="number" id="a" name="a" class="form-input" step="any" placeholder="-2">
+                        </div>
+                        <div class="form-section">
+                            <label for="b" class="form-label">
+                                <i class="fas fa-arrow-right"></i>
+                                Limite superior (b)
+                            </label>
+                            <input type="number" id="b" name="b" class="form-input" step="any" placeholder="2">
+                        </div>
+                    </div>
+                    
+                    <div id="newton-params" class="params-group">
+                        <div class="form-section">
+                            <label for="x0" class="form-label">
+                                <i class="fas fa-bullseye"></i>
+                                Ponto inicial (x₀)
+                            </label>
+                            <input type="number" id="x0" name="x0" class="form-input" step="any" placeholder="1">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="tolerance" class="form-label">
+                            <i class="fas fa-crosshairs"></i>
+                            Tolerância (ε)
+                        </label>
+                        <input type="number" id="tolerance" name="tolerance" class="form-input" step="any" value="0.000001" placeholder="0.000001">
+                    </div>
+
+                    <div class="form-section">
+                        <label for="max_iterations" class="form-label">
+                            <i class="fas fa-repeat"></i>
+                            Máx. iterações
+                        </label>
+                        <input type="number" id="max_iterations" name="max_iterations" class="form-input" value="100" min="1" max="1000">
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">
+                    <i class="fas fa-calculator"></i>
+                    <span>Calcular Raiz</span>
+                    <i class="fas fa-heart"></i>
+                </button>
+            </form>
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Calculando... 💖</p>
+            </div>
+
+            <div id="results" class="results hidden">
+                <div class="results-header">
+                    <h2><i class="fas fa-chart-line"></i> Resultados</h2>
+                    <div class="method-badge" id="methodBadge"></div>
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h3><i class="fas fa-bullseye"></i> Raiz Encontrada</h3>
+                        <div class="root-value" id="rootValue"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3><i class="fas fa-function"></i> f(raiz)</h3>
+                        <div class="function-value" id="functionValue"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3><i class="fas fa-clock"></i> Tempo</h3>
+                        <div class="time-value" id="timeValue"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3><i class="fas fa-list-ol"></i> Iterações</h3>
+                        <div class="iterations-value" id="iterationsValue"></div>
+                    </div>
+                </div>
+
+                <div class="convergence-info" id="convergenceInfo"></div>
+
+                <div class="iterations-table-container">
+                    <h3><i class="fas fa-table"></i> Tabela de Iterações</h3>
+                    <div class="table-wrapper">
+                        <table id="iterationsTable" class="iterations-table">
+                            <thead id="tableHead"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="error hidden">
+                <div class="error-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>💖 Feito com carinho para cálculos numéricos elegantes 💖</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
